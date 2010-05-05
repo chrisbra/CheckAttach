@@ -5,9 +5,9 @@ plugin/CheckAttach.vim	[[[1
 101
 " Vim plugin for checking attachments with mutt
 " Maintainer:  Christian Brabandt <cb@256bit.org>
-" Last Change: Wed, 05 May 2010 21:06:27 +0200
-" Version:     0.6
-" GetLatestVimScripts: 2796 5 :AutoInstall: CheckAttach.vim
+" Last Change: Wed, 05 May 2010 21:34:24 +0200
+" Version:     0.7
+" GetLatestVimScripts: 2796 6 :AutoInstall: CheckAttach.vim
 
 " Exit quickly when:
 " - this plugin was already loaded (or disabled)
@@ -101,15 +101,15 @@ fu! <SID>CheckFT()
         filetype detect
     endif
     if &ft =~ s:check_filetype | :call <SID>AutoCmd() | endif
-
-    if &ft =~ s:check_filetype | :call <SID>AutoCmd() | endif
 endfun
+
+call <sid>CheckFT()
 doc/CheckAttach.txt	[[[1
-99
+100
 *CheckAttach.txt*  Check attachments when using mutt - Vers 0.5  Mar 02, 2010
 
 Author:  Christian Brabandt <cb@256bit.org>
-Version: 0.6 Wed, 05 May 2010 21:06:27 +0200
+Version: 0.7 Wed, 05 May 2010 21:34:24 +0200
 Copyright: (c) 2009 by Christian Brabandt               *CheckAttach-copyright*
            The VIM LICENSE applies to CheckAttach.vim and CheckAttach.txt
            (see |copyright|) except use CheckAttach instead of "Vim".
@@ -189,6 +189,7 @@ only if you use :w it will.
 
 ==============================================================================
 2. CheckAttach History                                   *CheckAttach-history*
+    0.7: May  05, 2010     Force checking the filetype
     0.6: May  05, 2010     Force filetype detection, which did prevent
                              of the plugin to be working correctly
                            Created a public github repository at
