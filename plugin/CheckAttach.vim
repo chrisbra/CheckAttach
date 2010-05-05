@@ -91,5 +91,11 @@ fu! <SID>CheckFT()
     let s:filetype=(exists("attach_check_ft") ? attach_check_ft : 'mail')
     let s:check_filetype=join(split(escape(s:filetype, '\\*?'),','),'\|')
     "au FileType * if expand("<amatch>") =~ 'mail' | :call <SID>AutoCmd() | endif
+    " Force filetype detection, in case &ft is empty yet.
+    if empty(&ft)
+        filetype detect
+    endif
+    if &ft =~ s:check_filetype | :call <SID>AutoCmd() | endif
+
     if &ft =~ s:check_filetype | :call <SID>AutoCmd() | endif
 endfun
