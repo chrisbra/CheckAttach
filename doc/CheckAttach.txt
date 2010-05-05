@@ -1,9 +1,9 @@
-*CheckAttach.txt*  Check for attachments when using mutt - Vers 0.2   Sep 29, 2009
+*CheckAttach.txt*  Check for attachments when using mutt - Vers 0.3   Oct 1, 2009
 
 Author:  Christian Brabandt <cb@256bit.org>
 Copyright: (c) 2009 by Christian Brabandt 		    *CheckAttach-copyright*
-           The VIM LICENSE applies to SudoEdit.vim and SudoEdit.txt
-           (see |copyright|) except use SudoEdit instead of "Vim".
+           The VIM LICENSE applies to CheckAttach.vim and CheckAttach.txt
+           (see |copyright|) except use CheckAttach instead of "Vim".
 	   NO WARRANTY, EXPRESS OR IMPLIED.  USE AT-YOUR-OWN-RISK.
 
 
@@ -48,7 +48,7 @@ this means you would have to rename those files first before attaching them.
 
 You can specify which keywords will be searched by setting the
 g:attach_check_keywords variable. By default this variable is specified as:
-let g:attach_check_keywords = 'attach,attachment,angehängt,Anhang'
+let g:attach_check_keywords = 'attached,attachment,angehängt,Anhang'
 so that it can handle German and English. If you would like to add the keyword
 foobar, use this command:
 let g:attach_check_keywords .=',foobar'
@@ -65,6 +65,8 @@ only if you use :w it will.
 
 ==============================================================================
 2. CheckAttach History					    *CheckAttach-history*
+    0.3: Oct   1, 2009     Fixed Copyright statement, 
+                           enabled GetLatestScripts
     0.2: Sept 29, 2009     Added Documentation
     0.1: Sept 29, 2009	   First working version, using simple commands
 

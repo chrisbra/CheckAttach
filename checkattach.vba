@@ -2,13 +2,13 @@
 UseVimball
 finish
 doc/CheckAttach.txt	[[[1
-72
-*CheckAttach.txt*  Check for attachments when using mutt - Vers 0.2   Sep 29, 2009
+74
+*CheckAttach.txt*  Check for attachments when using mutt - Vers 0.3   Oct 1, 2009
 
 Author:  Christian Brabandt <cb@256bit.org>
 Copyright: (c) 2009 by Christian Brabandt 		    *CheckAttach-copyright*
-           The VIM LICENSE applies to SudoEdit.vim and SudoEdit.txt
-           (see |copyright|) except use SudoEdit instead of "Vim".
+           The VIM LICENSE applies to CheckAttach.vim and CheckAttach.txt
+           (see |copyright|) except use CheckAttach instead of "Vim".
 	   NO WARRANTY, EXPRESS OR IMPLIED.  USE AT-YOUR-OWN-RISK.
 
 
@@ -53,7 +53,7 @@ this means you would have to rename those files first before attaching them.
 
 You can specify which keywords will be searched by setting the
 g:attach_check_keywords variable. By default this variable is specified as:
-let g:attach_check_keywords = 'attach,attachment,angehängt,Anhang'
+let g:attach_check_keywords = 'attached,attachment,angehängt,Anhang'
 so that it can handle German and English. If you would like to add the keyword
 foobar, use this command:
 let g:attach_check_keywords .=',foobar'
@@ -70,17 +70,20 @@ only if you use :w it will.
 
 ==============================================================================
 2. CheckAttach History					    *CheckAttach-history*
+    0.3: Oct   1, 2009     Fixed Copyright statement, 
+                           enabled GetLatestScripts
     0.2: Sept 29, 2009     Added Documentation
     0.1: Sept 29, 2009	   First working version, using simple commands
 
 ==============================================================================
 vim:tw=78:ts=8:ft=help
 plugin/CheckAttach.vim	[[[1
-81
+82
 " Vim plugin for checking attachments with mutt
 " Maintainer:  Christian Brabandt <cb@256bit.org>
-" Last Change: 2009 Sep 29
-" Version:     0.2
+" Last Change: 2009 Oct 1
+" Version:     0.3
+" GetLatestVimScripts: 2796 2 :AutoInstall: CheckAttach.vim
 
 " Exit quickly when:
 " - this plugin was already loaded (or disabled)
@@ -95,7 +98,7 @@ let g:loaded_checkattach = 1
 let s:load_autocmd=1
 
 " On which keywords to trigger, comma separated list of keywords
-let g:attach_check_keywords = 'attach,attachment,angehängt,Anhang'
+let g:attach_check_keywords = 'attached,attachment,angehängt,Anhang'
 
 fu! <SID>AutoCmd()
     if !empty("s:load_autocmd") && s:load_autocmd && &ft == 'mail'

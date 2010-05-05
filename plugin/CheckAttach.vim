@@ -1,7 +1,8 @@
 " Vim plugin for checking attachments with mutt
 " Maintainer:  Christian Brabandt <cb@256bit.org>
-" Last Change: 2009 Sep 29
-" Version:     0.2
+" Last Change: 2009 Oct 1
+" Version:     0.3
+" GetLatestVimScripts: 2796 2 :AutoInstall: CheckAttach.vim
 
 " Exit quickly when:
 " - this plugin was already loaded (or disabled)
@@ -16,7 +17,7 @@ let g:loaded_checkattach = 1
 let s:load_autocmd=1
 
 " On which keywords to trigger, comma separated list of keywords
-let g:attach_check_keywords = 'attach,attachment,angehängt,Anhang'
+let g:attach_check_keywords = 'attached,attachment,angehängt,Anhang'
 
 fu! <SID>AutoCmd()
     if !empty("s:load_autocmd") && s:load_autocmd && &ft == 'mail'
