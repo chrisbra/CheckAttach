@@ -1,39 +1,51 @@
 " Vimball Archiver by Charles E. Campbell, Jr., Ph.D.
 UseVimball
 finish
-plugin/CheckAttach.vim	[[[1
-101
-" Vim plugin for checking attachments with mutt
+ftplugin/mail_CheckAttach.vim	[[[1
+103
+" Vim filetype plugin for checking attachments with mutt
 " Maintainer:  Christian Brabandt <cb@256bit.org>
-" Last Change: Wed, 05 May 2010 21:34:24 +0200
-" Version:     0.7
-" GetLatestVimScripts: 2796 6 :AutoInstall: CheckAttach.vim
+" Last Change: Mon, 29 Nov 2010 09:16:04 +0100
+" Version:     0.8
+" GetLatestVimScripts: 2796 7 :AutoInstall: CheckAttach.vim
 
+" Initialization "{{{1
 " Exit quickly when:
 " - this plugin was already loaded (or disabled)
 " - when 'compatible' is set
 " - the autocmd event is not availble.
-if exists("g:loaded_checkattach") || &cp || !exists("##BufWriteCmd") || !exists("##FileWriteCmd")
+if exists("g:loaded_checkattach") || &cp ||
+	\ !exists("##BufWriteCmd") || !exists("##FileWriteCmd")
   finish
 endif
 let g:loaded_checkattach = 1
+"}}}1
 
-" enable Autocommand for attachment checking
-let s:load_autocmd=1
+" default value, when plugin is loaded
+let s:load_autocmd = 1
 
-" List of highlighted matches
-let s:matchid=[]
+fu! <SID>Init() "{{{1
+    " List of highlighted matches
+    let s:matchid=[]
 
-" For which filetypes to check for attachments
-" Define as comma separated list. If you want additional filetypes
-" besides mail, use attach_check_ft to specify all filetypes
-let s:filetype=(exists("attach_check_ft") ? attach_check_ft : 'mail')
+    " On which keywords to trigger, comma separated list of keywords
+    let s:attach_check = 'attach,attachment,angehängt,Anhang'
+    let s:attach_check .= exists("g:attach_check_keywords") ? 
+	\ g:attach_check_keywords : ''
 
-" On which keywords to trigger, comma separated list of keywords
-let g:attach_check_keywords = 'attach,attachment,angehängt,Anhang'
+    " Enable Autocommand per default
+    let s:load_autocmd = exists("g:checkattach_autocmd") ? 
+	\ g:checkattach_autocmd : 1
+endfun
 
-fu! <SID>AutoCmd()
+fu! <SID>TriggerAuCmd(enable) "{{{1
+    call <SID>Init()
+    let s:load_autocmd = a:enable
+    call <SID>AutoCmd()
+endfun
 
+" Enable Auto command "{{{1
+fu! <SID>AutoCmd() "{{{2
     if !empty("s:load_autocmd") && s:load_autocmd 
 	augroup CheckAttach  
 	    au! BufWriteCmd * :call <SID>CheckAttach() 
@@ -46,70 +58,60 @@ fu! <SID>AutoCmd()
     endif
 endfu
 
-" Write the Buffer contents
-fu! <SID>WriteBuf(bang)
+" Write the Buffer contents "{{{1
+fu! <SID>WriteBuf(bang) "{{{2
     :exe ":write" . (a:bang ? '!' : '') . ' '  . expand("<amatch>")
     :setl nomod
-endfu
+endfu 
 
-" This function checks your mail for the words specified in
+" This function checks your mail for the words specified in "{{{1
 " check, and if it find them, you'll be asked to attach
-" a file.
-fu! <SID>CheckAttach()"{{{
-    if exists("g:attach_check_keywords")
-       let s:attach_check = g:attach_check_keywords
-    endif
-
+" a file. 
+fu! <SID>CheckAttach()"{{{2
+    call <SID>Init()
     if empty("s:attach_check") || v:cmdbang
-	:call <SID>WriteBuf(v:cmdbang)
+	call <SID>WriteBuf(v:cmdbang)
 	return
     endif
-    let oldPos=getpos('.')
-    let ans=1
+    let oldPos=winsaveview()
     let val = join(split(escape(s:attach_check,' \.+*'), ','),'\|')
     1
     if search('\c\%('.val.'\)','W')
-	call add(s:matchid,matchadd('WarningMsg', '\%('.val.'\)'))
+	" Delete old highlighting, don't pollute buffer with matches
+	if exists("s:matchid")
+	    "for i in s:matchid | call matchdelete(i) | endfor
+	    map(s:matchid, 'matchdelete(v:val)')
+	    let s:matchid=[]
+	endif
+	call add(s:matchid,matchadd('WarningMsg', '\c\%('.val.'\)'))
+	redr!
         let ans=input("Attach file: (leave empty to abbort): ", "", "file")
         while (ans != '') && (ans != 'n')
                 let list = split(expand(glob(ans)), "\n")
                 for attach in list
-                    normal magg}-
+                    norm! magg}-
                     call append(line('.'), 'Attach: ' . escape(attach, ' '))
                     redraw
                 endfor
             let ans=input("Attach another file?: (leave empty to abbort): ", "", "file")
         endwhile
     endif
-    :call <SID>WriteBuf(v:cmdbang)
-    call setpos('.', oldPos)
-endfu"}}}
+    call <SID>WriteBuf(v:cmdbang)
+    call winrestview(oldPos)
+endfu "}}}2
 
-" Define commands that will disable and enable the plugin.
-command! DisableCheckAttach let s:load_autocmd=0 | :call <SID>CheckFT()
-command! EnableCheckAttach let s:load_autocmd=1 | :call <SID>CheckFT()
+" Define commands that will disable and enable the plugin. "{{{1
+command! EnableCheckAttach  :call <SID>TriggerAuCmd(1)
+command! DisableCheckAttach :call <SID>TriggerAuCmd(0)
 
-" Enable autocommand when loading file
-":call <SID>AutoCmd()
-
-fu! <SID>CheckFT()
-    let s:filetype=(exists("attach_check_ft") ? attach_check_ft : 'mail')
-    let s:check_filetype=join(split(escape(s:filetype, '\\*?'),','),'\|')
-    "au FileType * if expand("<amatch>") =~ 'mail' | :call <SID>AutoCmd() | endif
-    " Force filetype detection, in case &ft is empty yet.
-    if empty(&ft)
-        filetype detect
-    endif
-    if &ft =~ s:check_filetype | :call <SID>AutoCmd() | endif
-endfun
-
-call <sid>CheckFT()
+" call Autocommand when loading mail
+call <SID>TriggerAuCmd(s:load_autocmd)
 doc/CheckAttach.txt	[[[1
-100
+93
 *CheckAttach.txt*  Check attachments when using mutt - Vers 0.5  Mar 02, 2010
 
 Author:  Christian Brabandt <cb@256bit.org>
-Version: 0.7 Wed, 05 May 2010 21:34:24 +0200
+Version: 0.8 Mon, 29 Nov 2010 09:16:04 +0100
 Copyright: (c) 2009 by Christian Brabandt               *CheckAttach-copyright*
            The VIM LICENSE applies to CheckAttach.vim and CheckAttach.txt
            (see |copyright|) except use CheckAttach instead of "Vim".
@@ -162,20 +164,10 @@ let g:attach_check_keywords = 'attached,attachment,angehängt,Anhang'
 so that it can handle German and English. If you would like to add the keyword
 foobar, use this command:
 
-let g:attach_check_keywords .=',foobar'
+let g:attach_check_keywords =',foobar'
 
 NOTE: The comma is important. It is used to seperate the different keywords
 and needs to be included.
-
-By default this plugin only works with mail filetypes. So it shouldn't
-interfere, when you are writing C-Code or wrinting a report. You can however
-define for which filetypes this plugin will be enabled. This is done by
-specifying attach_check_ft as comma separated list for all filetypes that
-you'll want to be checked. If attach_check_ft is not defined, it is set to
-the default filetype 'mail'. So to add a new filetype, do something like this
-in your .vimrc:
-
-let g:attach_check_ft='mail,foobar'
 
                                       *EnableCheckAttach* *DisableCheckAttach*
 You can disable the plugin by issuing the command 
@@ -186,9 +178,12 @@ You can also use the ! attribute when saving your buffer to temporarily skip
 the check. So if you use :w! the buffer will not be checked for attachments,
 only if you use :w it will.
 
-
 ==============================================================================
 2. CheckAttach History                                   *CheckAttach-history*
+    0.8: Nov  29, 2010     Make ftplugin instead of plugin,
+                           don't trigger check of filetypes
+                           clear matchlist on next run
+                           code cleanup
     0.7: May  05, 2010     Force checking the filetype
     0.6: May  05, 2010     Force filetype detection, which did prevent
                              of the plugin to be working correctly

@@ -1,7 +1,7 @@
-*CheckAttach.txt*  Check attachments when using mutt - Vers 0.5  Mar 02, 2010
+*CheckAttach.txt*  Check attachments when using mutt - Vers 0.8  Mar 02, 2010
 
 Author:  Christian Brabandt <cb@256bit.org>
-Version: 0.7 Wed, 05 May 2010 21:34:24 +0200
+Version: 0.8 Mon, 29 Nov 2010 09:16:04 +0100
 Copyright: (c) 2009 by Christian Brabandt               *CheckAttach-copyright*
            The VIM LICENSE applies to CheckAttach.vim and CheckAttach.txt
            (see |copyright|) except use CheckAttach instead of "Vim".
@@ -54,20 +54,13 @@ let g:attach_check_keywords = 'attached,attachment,angehängt,Anhang'
 so that it can handle German and English. If you would like to add the keyword
 foobar, use this command:
 
-let g:attach_check_keywords .=',foobar'
+let g:attach_check_keywords =',foobar'
 
 NOTE: The comma is important. It is used to seperate the different keywords
 and needs to be included.
 
-By default this plugin only works with mail filetypes. So it shouldn't
-interfere, when you are writing C-Code or wrinting a report. You can however
-define for which filetypes this plugin will be enabled. This is done by
-specifying attach_check_ft as comma separated list for all filetypes that
-you'll want to be checked. If attach_check_ft is not defined, it is set to
-the default filetype 'mail'. So to add a new filetype, do something like this
-in your .vimrc:
-
-let g:attach_check_ft='mail,foobar'
+If you'd like to suggest adding additional keywords (for your language),
+please contact the author (see first line of this help page).
 
                                       *EnableCheckAttach* *DisableCheckAttach*
 You can disable the plugin by issuing the command 
@@ -78,9 +71,12 @@ You can also use the ! attribute when saving your buffer to temporarily skip
 the check. So if you use :w! the buffer will not be checked for attachments,
 only if you use :w it will.
 
-
 ==============================================================================
 2. CheckAttach History                                   *CheckAttach-history*
+    0.8: Nov  29, 2010     Make ftplugin instead of plugin,
+                           don't trigger check of filetypes
+                           clear matchlist on next run
+                           code cleanup
     0.7: May  05, 2010     Force checking the filetype
     0.6: May  05, 2010     Force filetype detection, which did prevent
                              of the plugin to be working correctly
