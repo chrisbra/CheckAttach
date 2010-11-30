@@ -107,8 +107,8 @@ command! DisableCheckAttach :call <SID>TriggerAuCmd(0)
 " call Autocommand when loading mail
 call <SID>TriggerAuCmd(s:load_autocmd)
 doc/CheckAttach.txt	[[[1
-93
-*CheckAttach.txt*  Check attachments when using mutt - Vers 0.5  Mar 02, 2010
+96
+*CheckAttach.txt*  Check attachments when using mutt - Vers 0.8  Mar 02, 2010
 
 Author:  Christian Brabandt <cb@256bit.org>
 Version: 0.8 Mon, 29 Nov 2010 09:16:04 +0100
@@ -168,6 +168,9 @@ let g:attach_check_keywords =',foobar'
 
 NOTE: The comma is important. It is used to seperate the different keywords
 and needs to be included.
+
+If you'd like to suggest adding additional keywords (for your language),
+please contact the author (see first line of this help page).
 
                                       *EnableCheckAttach* *DisableCheckAttach*
 You can disable the plugin by issuing the command 
