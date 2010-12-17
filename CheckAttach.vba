@@ -2,12 +2,12 @@
 UseVimball
 finish
 ftplugin/mail_CheckAttach.vim	[[[1
-103
+130
 " Vim filetype plugin for checking attachments with mutt
 " Maintainer:  Christian Brabandt <cb@256bit.org>
-" Last Change: Mon, 29 Nov 2010 09:16:04 +0100
-" Version:     0.8
-" GetLatestVimScripts: 2796 7 :AutoInstall: CheckAttach.vim
+" Last Change: Fri, 17 Dec 2010 09:03:47 +0100
+" Version:     0.9
+" GetLatestVimScripts: 2796 8 :AutoInstall: CheckAttach.vim
 
 " Initialization "{{{1
 " Exit quickly when:
@@ -99,19 +99,46 @@ fu! <SID>CheckAttach()"{{{2
     call <SID>WriteBuf(v:cmdbang)
     call winrestview(oldPos)
 endfu "}}}2
+fu! <SID>AttachFile(pattern) "{{{2
+    let oldpos=winsaveview()
+    let lastline=line('$')
+    " start at line 1, later we are searching the end
+    " of the header of the mail, so that we can append the 
+    " Attach-headers there.
+    1
+    let header_end=search('^$', 'nW')
+    for item in split(a:pattern, ' ')
+	let list=split(expand(glob(item)), "\n")
+	for file in list
+	    norm! gg}-
+	    call append(line('.'), 'Attach: ' . escape(file, ' '))
+	    redraw
+	endfor
+    endfor
+    let newlastline=line('$')
+    " Adding text above, means, we need to adjust
+    " the cursor position from the oldpos dictionary. 
+    " Shoud oldpos.topline also be adjusted ?
+    let oldpos.lnum+=newlastline-lastline
+    if oldpos.topline > header_end
+	let oldpos.topline+=newlastline-lastline
+    endif
+    call winrestview(oldpos)
+endfun
 
 " Define commands that will disable and enable the plugin. "{{{1
 command! EnableCheckAttach  :call <SID>TriggerAuCmd(1)
 command! DisableCheckAttach :call <SID>TriggerAuCmd(0)
+command! -nargs=+ -complete=file  AttachFile1 :call <SID>AttachFile(<q-args>)
 
 " call Autocommand when loading mail
 call <SID>TriggerAuCmd(s:load_autocmd)
 doc/CheckAttach.txt	[[[1
-96
+105
 *CheckAttach.txt*  Check attachments when using mutt - Vers 0.8  Mar 02, 2010
 
 Author:  Christian Brabandt <cb@256bit.org>
-Version: 0.8 Mon, 29 Nov 2010 09:16:04 +0100
+Version: 0.9 Fri, 17 Dec 2010 09:03:47 +0100
 Copyright: (c) 2009 by Christian Brabandt               *CheckAttach-copyright*
            The VIM LICENSE applies to CheckAttach.vim and CheckAttach.txt
            (see |copyright|) except use CheckAttach instead of "Vim".
@@ -172,17 +199,26 @@ and needs to be included.
 If you'd like to suggest adding additional keywords (for your language),
 please contact the author (see first line of this help page).
 
-                                      *EnableCheckAttach* *DisableCheckAttach*
-You can disable the plugin by issuing the command 
-:DisableCheckAttach
-Enabling the attachment check is then again enabled by issuing
-:EnableCheckAttach
+                                      *:EnableCheckAttach* *:DisableCheckAttach*
+You can disable the plugin by issuing the command >
+    :DisableCheckAttach
+Enabling the attachment check is then again enabled by issuing >
+    :EnableCheckAttach
 You can also use the ! attribute when saving your buffer to temporarily skip
 the check. So if you use :w! the buffer will not be checked for attachments,
 only if you use :w it will.
 
+                                                            *:AttachFile*
+The plugin also defines the command :AttachFile. This allows you to simply
+attache any number of files, using a glob pattern. So, if you like to attach
+all your pictures from ~/pictures/ you can simply enter: >
+     :AttachFile ~/picutures/*.jpg
+and all jpg files will be attached automatically. You can use <Tab> to
+complete the directory.
+
 ==============================================================================
 2. CheckAttach History                                   *CheckAttach-history*
+    0.9: Dec  17, 2010     new command |:AttachFile|
     0.8: Nov  29, 2010     Make ftplugin instead of plugin,
                            don't trigger check of filetypes
                            clear matchlist on next run
