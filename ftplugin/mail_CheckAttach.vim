@@ -94,10 +94,37 @@ fu! <SID>CheckAttach()"{{{2
     call <SID>WriteBuf(v:cmdbang)
     call winrestview(oldPos)
 endfu "}}}2
+fu! <SID>AttachFile(pattern) "{{{2
+    let oldpos=winsaveview()
+    let lastline=line('$')
+    " start at line 1, later we are searching the end
+    " of the header of the mail, so that we can append the 
+    " Attach-headers there.
+    1
+    let header_end=search('^$', 'nW')
+    for item in split(a:pattern, ' ')
+	let list=split(expand(glob(item)), "\n")
+	for file in list
+	    norm! gg}-
+	    call append(line('.'), 'Attach: ' . escape(file, ' '))
+	    redraw
+	endfor
+    endfor
+    let newlastline=line('$')
+    " Adding text above, means, we need to adjust
+    " the cursor position from the oldpos dictionary. 
+    " Shoud oldpos.topline also be adjusted ?
+    let oldpos.lnum+=newlastline-lastline
+    if oldpos.topline > header_end
+	let oldpos.topline+=newlastline-lastline
+    endif
+    call winrestview(oldpos)
+endfun
 
 " Define commands that will disable and enable the plugin. "{{{1
 command! EnableCheckAttach  :call <SID>TriggerAuCmd(1)
 command! DisableCheckAttach :call <SID>TriggerAuCmd(0)
+command! -nargs=+ -complete=file  AttachFile1 :call <SID>AttachFile(<q-args>)
 
 " call Autocommand when loading mail
 call <SID>TriggerAuCmd(s:load_autocmd)
