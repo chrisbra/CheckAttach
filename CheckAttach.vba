@@ -13,7 +13,7 @@ ftplugin/mail_CheckAttach.vim	[[[1
 " Exit quickly when:
 " - this plugin was already loaded (or disabled)
 " - when 'compatible' is set
-" - the autocmd event is not availble.
+" - the autocmd event is not available.
 if exists("g:loaded_checkattach") || &cp ||
 	\ !exists("##BufWriteCmd") || !exists("##FileWriteCmd")
   finish
@@ -118,7 +118,7 @@ fu! <SID>AttachFile(pattern) "{{{2
     let newlastline=line('$')
     " Adding text above, means, we need to adjust
     " the cursor position from the oldpos dictionary. 
-    " Shoud oldpos.topline also be adjusted ?
+    " Should oldpos.topline also be adjusted ?
     let oldpos.lnum+=newlastline-lastline
     if oldpos.topline > header_end
 	let oldpos.topline+=newlastline-lastline
@@ -162,7 +162,7 @@ This plugin checks, whether certain keywords exist in your mail, and if found,
 you'll be asked to attach the files. This is done to prevent that you sent
 mails in which you announce to attach some files but actually forget to attach
 the files so that your have to write a second mail which often is quite
-embarassing.
+embarrassing.
 
 Therefore this plugin checks for the presence of keywords which indicate that
 an attachment should be attached. If if finds these keywords, the plugin will
@@ -193,7 +193,7 @@ foobar, use this command:
 
 let g:attach_check_keywords =',foobar'
 
-NOTE: The comma is important. It is used to seperate the different keywords
+NOTE: The comma is important. It is used to separate the different keywords
 and needs to be included.
 
 If you'd like to suggest adding additional keywords (for your language),
@@ -210,9 +210,9 @@ only if you use :w it will.
 
                                                             *:AttachFile*
 The plugin also defines the command :AttachFile. This allows you to simply
-attache any number of files, using a glob pattern. So, if you like to attach
+attach any number of files, using a glob pattern. So, if you like to attach
 all your pictures from ~/pictures/ you can simply enter: >
-     :AttachFile ~/picutures/*.jpg
+     :AttachFile ~/pictures/*.jpg
 and all jpg files will be attached automatically. You can use <Tab> to
 complete the directory.
 
