@@ -134,7 +134,7 @@ command! -nargs=+ -complete=file  AttachFile1 :call <SID>AttachFile(<q-args>)
 " call Autocommand when loading mail
 call <SID>TriggerAuCmd(s:load_autocmd)
 doc/CheckAttach.txt	[[[1
-105
+106
 *CheckAttach.txt*  Check attachments when using mutt - Vers 0.8  Mar 02, 2010
 
 Author:  Christian Brabandt <cb@256bit.org>
@@ -218,6 +218,7 @@ complete the directory.
 
 ==============================================================================
 2. CheckAttach History                                   *CheckAttach-history*
+   0.10: Jan  17, 2011     Spelling fixes by Scott Stevenson (Thanks!)
     0.9: Dec  17, 2010     new command |:AttachFile|
     0.8: Nov  29, 2010     Make ftplugin instead of plugin,
                            don't trigger check of filetypes
