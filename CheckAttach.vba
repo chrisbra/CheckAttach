@@ -85,7 +85,7 @@ fu! <SID>CheckAttach()"{{{2
 	endif
 	call add(s:matchid,matchadd('WarningMsg', '\c\%('.val.'\)'))
 	redr!
-        let ans=input("Attach file: (leave empty to abbort): ", "", "file")
+        let ans=input("Attach file: (leave empty to abort): ", "", "file")
         while (ans != '') && (ans != 'n')
                 let list = split(expand(glob(ans)), "\n")
                 for attach in list
@@ -93,7 +93,7 @@ fu! <SID>CheckAttach()"{{{2
                     call append(line('.'), 'Attach: ' . escape(attach, ' '))
                     redraw
                 endfor
-            let ans=input("Attach another file?: (leave empty to abbort): ", "", "file")
+            let ans=input("Attach another file?: (leave empty to abort): ", "", "file")
         endwhile
     endif
     call <SID>WriteBuf(v:cmdbang)
@@ -170,7 +170,7 @@ highlight the keywords and ask you for the files to attach, whenever you save
 your mail.
 
 This looks like this:
-Attach file: (leave empty to abbort):
+Attach file: (leave empty to abort):
 
 At that prompt you can specify any file you'd like to attach. It allows
 filename completion, so you can use <Tab> to let vim complete file paths.
