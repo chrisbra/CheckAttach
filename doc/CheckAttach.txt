@@ -1,7 +1,7 @@
 *CheckAttach.txt*  Check attachments when using mutt - Vers 0.5  Mar 02, 2010
 
 Author:  Christian Brabandt <cb@256bit.org>
-Version: 0.7 Wed, 05 May 2010 21:34:24 +0200
+Version: 0.8 Fri, 30 Sep 2011 14:08:55 +0200
 Copyright: (c) 2009 by Christian Brabandt               *CheckAttach-copyright*
            The VIM LICENSE applies to CheckAttach.vim and CheckAttach.txt
            (see |copyright|) except use CheckAttach instead of "Vim".

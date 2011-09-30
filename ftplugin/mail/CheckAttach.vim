@@ -1,8 +1,8 @@
 " Vim plugin for checking attachments with mutt
 " Maintainer:  Christian Brabandt <cb@256bit.org>
-" Last Change: Wed, 05 May 2010 21:34:24 +0200
-" Version:     0.7
-" GetLatestVimScripts: 2796 6 :AutoInstall: CheckAttach.vim
+" Last Change: Fri, 30 Sep 2011 14:08:55 +0200
+" Version:     0.8
+" GetLatestVimScripts: 2796 7 :AutoInstall: CheckAttach.vim
 
 " Plugin folklore "{{{2
 " Exit quickly when: 
