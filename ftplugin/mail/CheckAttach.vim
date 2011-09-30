@@ -24,11 +24,6 @@ let s:load_autocmd=1
 " List of highlighted matches
 let s:matchid=[]
 
-" For which filetypes to check for attachments
-" Define as comma separated list. If you want additional filetypes
-" besides mail, use attach_check_ft to specify all filetypes
-let s:filetype=(exists("attach_check_ft") ? attach_check_ft : 'mail')
-
 " On which keywords to trigger, comma separated list of keywords
 let g:attach_check_keywords = 'attach,attachment,angehängt,Anhang'
 
