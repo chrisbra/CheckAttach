@@ -1,7 +1,7 @@
-*CheckAttach.txt*  Check attachments when using mutt - Vers 0.5  Mar 02, 2010
+*CheckAttach.txt*  Check attachments when using mutt - Vers 0.8  Mar 02, 2010
 
 Author:  Christian Brabandt <cb@256bit.org>
-Version: 0.8 Fri, 30 Sep 2011 14:22:21 +0200
+Version: 0.10 Mon, 17 Jan 2011 20:36:30 +0100
 Copyright: (c) 2009 by Christian Brabandt               *CheckAttach-copyright*
            The VIM LICENSE applies to CheckAttach.vim and CheckAttach.txt
            (see |copyright|) except use CheckAttach instead of "Vim".
@@ -25,7 +25,7 @@ This plugin checks, whether certain keywords exist in your mail, and if found,
 you'll be asked to attach the files. This is done to prevent that you sent
 mails in which you announce to attach some files but actually forget to attach
 the files so that your have to write a second mail which often is quite
-embarassing.
+embarrassing.
 
 Therefore this plugin checks for the presence of keywords which indicate that
 an attachment should be attached. If if finds these keywords, the plugin will
@@ -33,7 +33,7 @@ highlight the keywords and ask you for the files to attach, whenever you save
 your mail.
 
 This looks like this:
-Attach file: (leave empty to abbort):
+Attach file: (leave empty to abort):
 
 At that prompt you can specify any file you'd like to attach. It allows
 filename completion, so you can use <Tab> to let vim complete file paths.
@@ -54,9 +54,9 @@ let g:attach_check_keywords = 'attached,attachment,angehängt,Anhang'
 so that it can handle German and English. If you would like to add the keyword
 foobar, use this command:
 
-let g:attach_check_keywords .=',foobar'
+let g:attach_check_keywords =',foobar'
 
-NOTE: The comma is important. It is used to seperate the different keywords
+NOTE: The comma is important. It is used to separate the different keywords
 and needs to be included.
 
                                                         *CheckAttach_Problems*
@@ -79,17 +79,34 @@ You can disable the plugin by issuing the command
 :DisableCheckAttach
 Enabling the attachment check is then again enabled by issuing
 :EnableCheckAttach
+
+If you'd like to suggest adding additional keywords (for your language),
+please contact the author (see first line of this help page).
+
 You can also use the ! attribute when saving your buffer to temporarily skip
 the check. So if you use :w! the buffer will not be checked for attachments,
 only if you use :w it will.
 
+                                                            *:AttachFile*
+The plugin also defines the command :AttachFile. This allows you to simply
+attach any number of files, using a glob pattern. So, if you like to attach
+all your pictures from ~/pictures/ you can simply enter: >
+     :AttachFile ~/pictures/*.jpg
+and all jpg files will be attached automatically. You can use <Tab> to
+complete the directory.
 
 ==============================================================================
 2. CheckAttach History                                   *CheckAttach-history*
-    0.8: Sep  30, 2011     Make a filetype plugin out of it, it does not
+    0.11: Sep  30, 2011    Make a filetype plugin out of it, it does not
                              make sense to have it as plugin, since its only
                              use is with mutt (aka ft: mail)
                            Documentation update
+   0.10: Jan  17, 2011     Spelling fixes by Scott Stevenson (Thanks!)
+    0.9: Dec  17, 2010     new command |:AttachFile|
+    0.8: Nov  29, 2010     Make ftplugin instead of plugin,
+                           don't trigger check of filetypes
+                           clear matchlist on next run
+                           code cleanup
     0.7: May  05, 2010     Force checking the filetype
     0.6: May  05, 2010     Force filetype detection, which did prevent
                              of the plugin to be working correctly
