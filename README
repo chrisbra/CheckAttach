@@ -1,7 +1,7 @@
 *CheckAttach.txt*  Check attachments when using mutt - Vers 0.5  Mar 02, 2010
 
 Author:  Christian Brabandt <cb@256bit.org>
-Version: 0.8 Fri, 30 Sep 2011 14:08:55 +0200
+Version: 0.8 Fri, 30 Sep 2011 14:22:21 +0200
 Copyright: (c) 2009 by Christian Brabandt               *CheckAttach-copyright*
            The VIM LICENSE applies to CheckAttach.vim and CheckAttach.txt
            (see |copyright|) except use CheckAttach instead of "Vim".
@@ -59,15 +59,20 @@ let g:attach_check_keywords .=',foobar'
 NOTE: The comma is important. It is used to seperate the different keywords
 and needs to be included.
 
-By default this plugin only works with mail filetypes. So it shouldn't
-interfere, when you are writing C-Code or wrinting a report. You can however
-define for which filetypes this plugin will be enabled. This is done by
-specifying attach_check_ft as comma separated list for all filetypes that
-you'll want to be checked. If attach_check_ft is not defined, it is set to
-the default filetype 'mail'. So to add a new filetype, do something like this
-in your .vimrc:
+                                                        *CheckAttach_Problems*
+Problems with CheckAttach
+========================
 
-let g:attach_check_ft='mail,foobar'
+If you try to attach a file, whose name contains 8bit letters, it could be,
+that mutt can't attach that file and instead displays an error message similar
+to this one:
+
+    "<filename>: unable to attach file"
+
+where <filename> is mangled, this is a problem with the way mutt works in
+conjunction with the assumed_charset patch. In this case, you should either
+not use filenames containing 8bit letters or only 8bit letters in the same
+encoding as given to the assumed_charset option.
 
                                       *EnableCheckAttach* *DisableCheckAttach*
 You can disable the plugin by issuing the command 
@@ -81,6 +86,10 @@ only if you use :w it will.
 
 ==============================================================================
 2. CheckAttach History                                   *CheckAttach-history*
+    0.8: Sep  30, 2011     Make a filetype plugin out of it, it does not
+                             make sense to have it as plugin, since its only
+                             use is with mutt (aka ft: mail)
+                           Documentation update
     0.7: May  05, 2010     Force checking the filetype
     0.6: May  05, 2010     Force filetype detection, which did prevent
                              of the plugin to be working correctly
