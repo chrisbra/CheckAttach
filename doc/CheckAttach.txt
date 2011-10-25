@@ -97,6 +97,8 @@ complete the directory.
 
 ==============================================================================
 2. CheckAttach History                                   *CheckAttach-history*
+   0.12: Oct  25, 2011     Update the plugin (include some changes, that got
+                             lost with 0.11)
    0.11: Sep  30, 2011     Make a filetype plugin out of it, it does not
                              make sense to have it as plugin, since its only
                              use is with mutt (aka ft: mail)
