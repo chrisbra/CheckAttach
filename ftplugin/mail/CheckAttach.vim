@@ -117,7 +117,7 @@ fu! <SID>CheckAttach() "{{{2
 	    map(s:matchid, 'matchdelete(v:val)')
 	    let s:matchid=[]
 	endif
-	call add(s:matchid,matchadd('WarningMsg', '\c\%('.val.'\)'))
+	call add(s:matchid,matchadd('WildMenu', '\c\%('.val.'\)'))
 	redr!
         let ans=input("Attach file: (leave empty to abort): ", "", "file")
         while (ans != '') && (ans != 'n')
