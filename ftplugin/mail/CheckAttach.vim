@@ -110,14 +110,16 @@ fu! <SID>CheckAttach() "{{{2
     let ans=1
     let val = join(split(escape(s:attach_check,' \.+*'), ','),'\|')
     1
-    if search('\c\%('.val.'\)','W')
+    let pat = '\(^\s*>\+.*\)\@<!\c\%(' . val . '\)'
+    " don't match in the quoted part of the message
+    if search(pat, 'W')
 	" Delete old highlighting, don't pollute buffer with matches
 	if exists("s:matchid")
 	    "for i in s:matchid | call matchdelete(i) | endfor
 	    map(s:matchid, 'matchdelete(v:val)')
 	    let s:matchid=[]
 	endif
-	call add(s:matchid,matchadd('WildMenu', '\c\%('.val.'\)'))
+	call add(s:matchid,matchadd('WildMenu', pat))
 	redr!
         let ans=input("Attach file: (leave empty to abort): ", "", "file")
         while (ans != '') && (ans != 'n')
