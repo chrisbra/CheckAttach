@@ -124,8 +124,8 @@ fu! <SID>CheckAttach() "{{{2
     let prompt = "Attach file: (leave empty to abort): "
     if !empty(s:external_file_browser)
 	let prompt = substitute(prompt, ')', ', Space starts filebrowser)', '')
-	let prompt2 = substitute(prompt, 'file', 'another &', '')
     endif
+    let prompt2 = substitute(prompt, 'file', 'another &', '')
     " don't match in the quoted part of the message
     if search(pat, 'W')
 	" Delete old highlighting, don't pollute buffer with matches
@@ -165,7 +165,7 @@ fu! <SID>ExternalFileBrowser(pat) "{{{2
     redr!
     if filereadable(s:external_choosefile)
 	call append('.', map(readfile(s:external_choosefile), '"Attach: ".
-	    \escape(v:val, " \t\\")'))
+	    \ escape(v:val, " \t\\")'))
 	call delete(s:external_choosefile)
     endif
 endfu
