@@ -27,10 +27,11 @@ mails in which you announce to attach some files but actually forget to attach
 the files so that your have to write a second mail which often is quite
 embarrassing.
 
-Therefore this plugin checks for the presence of keywords which indicate that
-an attachment should be attached. If if finds these keywords, the plugin will
-highlight the keywords and ask you for the files to attach, whenever you save
-your mail.
+Therefore this plugin checks for the presence of keywords (but does not
+consider the quoted part of the message, that is, any line that does not start
+with '>') which indicate that an attachment should be attached. If if finds
+these keywords, the plugin will highlight the keywords and ask you for the
+files to attach, whenever you save your mail.
 
 This looks like this:
 Attach file: (leave empty to abort):
@@ -143,6 +144,9 @@ complete the directory.
                              for selecting the files (suggested by mutt-users
                              mailinglist)
                            Command definition will be buffer local
+                           Don't check for matches of the keywords in the
+                             quoted of the message (suggested by Sebastion
+                             Tramp, thanks!)
    0.12: Oct  25, 2011     Update the plugin (include some changes, that got
                              lost with 0.11)
    0.11: Sep  30, 2011     Make a filetype plugin out of it, it does not
