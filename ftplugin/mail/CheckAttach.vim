@@ -31,6 +31,7 @@ fu! <SID>WarningMsg(msg) "{{{2
     else
 	    echomsg msg
     endif
+    sleep 1
     echohl Normal
     let v:errmsg = msg
 endfun
@@ -48,21 +49,30 @@ fu! <SID>Init() "{{{2
     let s:external_file_browser = exists("g:checkattach_filebrowser") ? 
 	\ g:checkattach_filebrowser : ''
 
-    let s:external_choosefile = fnameescape(tempname())
-    if s:external_file_browser == 'ranger'
-	if system(s:external_file_browser . ' --choosefiles=' .
-		\ s:external_choosefile . ' --version ') =~
-		\ 'no such option: --choosefiles'
-	    let s:external_file_browser = 'ranger --choosefile=' .
-		\ s:external_choosefile
-	else
-	    let s:external_file_browser = 'ranger --choosefiles=' .
-		\ s:external_choosefile
+    if !empty(s:external_file_browser)
+	let s:external_choosefile = fnameescape(tempname())
+	if s:external_file_browser == 'ranger'
+	    if system(s:external_file_browser . ' --choosefiles=' .
+		    \ s:external_choosefile . ' --version ') =~
+		    \ 'no such option: --choosefiles'
+		let s:external_file_browser = 'ranger --choosefile=' .
+		    \ s:external_choosefile
+	    else
+		let s:external_file_browser = 'ranger --choosefiles=' .
+		    \ s:external_choosefile
+	    endif
 	endif
-    endif
-    if s:external_file_browser =~ '%s'
-	let s:external_file_browser = substitute(s:external_file_browser,
-	    \ '%s', s:external_choosefile, 'g')
+	if s:external_file_browser =~ '%s'
+	    let s:external_file_browser = substitute(s:external_file_browser,
+		\ '%s', s:external_choosefile, 'g')
+	endif
+	" Check that the part until the first space is executable
+	let binary = matchstr(s:external_file_browser,
+		    \ '^[^[:blank:]\\]\+\(\\\s\S\+\)\?')
+	if !executable(binary)
+	    call <sid>WarningMsg(binary . ' is not executable!')
+	    let s:external_file_browser = ''
+	endif
     endif
 
     " Enable Autocommand per default
@@ -111,6 +121,11 @@ fu! <SID>CheckAttach() "{{{2
     let val = join(split(escape(s:attach_check,' \.+*'), ','),'\|')
     1
     let pat = '\(^\s*>\+.*\)\@<!\c\%(' . val . '\)'
+    let prompt = "Attach file: (leave empty to abort): "
+    if !empty(s:external_file_browser)
+	let prompt = substitute(prompt, ')', ', Space starts filebrowser)', '')
+	let prompt2 = substitute(prompt, 'file', 'another &', '')
+    endif
     " don't match in the quoted part of the message
     if search(pat, 'W')
 	" Delete old highlighting, don't pollute buffer with matches
@@ -121,7 +136,7 @@ fu! <SID>CheckAttach() "{{{2
 	endif
 	call add(s:matchid,matchadd('WildMenu', pat))
 	redr!
-        let ans=input("Attach file: (leave empty to abort): ", "", "file")
+	let ans=input(prompt, "", "file")
         while (ans != '') && (ans != 'n')
 	    norm! gg}-
 	    if empty(s:external_file_browser)
@@ -131,8 +146,7 @@ fu! <SID>CheckAttach() "{{{2
 			\ escape(attach, " \t\\"))
 		    redraw
 		endfor
-		let ans=input("Attach another file?: (leave empty to abort): "
-		    \ , "", "file")
+		let ans=input(prompt2, "", "file")
 	    else
 		call <sid>ExternalFileBrowser(isdirectory(ans) ? ans : 
 			\ fnamemodify(ans, ':h'))
