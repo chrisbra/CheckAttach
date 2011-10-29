@@ -116,6 +116,7 @@ fu! <SID>CheckAlreadyAttached() "{{{2
 	return 0
     endif
 endfu
+
 fu! <SID>CheckAttach() "{{{2
     " This function checks your mail for the words specified in
     " check, and if it find them, you'll be asked to attach
@@ -132,6 +133,7 @@ fu! <SID>CheckAttach() "{{{2
     let s:lastline = line('$')
     1
     let val = join(split(escape(s:attach_check,' \.+*'), ','),'\|')
+    " don't match in the quoted part of the message
     let pat = '\(^\s*>\+.*\)\@<!\c\%(' . val . '\)'
     let prompt = "Attach file: (leave empty to abort): "
     if !empty(s:external_file_browser)
@@ -143,7 +145,6 @@ fu! <SID>CheckAttach() "{{{2
     call search('^Subject:', 'W')
     let subj = getpos('.')
     let ans=1
-    " don't match in the quoted part of the message
     if search(pat, 'W') && !<sid>CheckAlreadyAttached()
 	" Delete old highlighting, don't pollute buffer with matches
 	if exists("s:matchid")
