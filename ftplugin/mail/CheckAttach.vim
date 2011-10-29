@@ -107,6 +107,15 @@ fu! <SID>WriteBuf(bang) "{{{2
     setl nomod
 endfu
 
+fu! <SID>CheckAlreadyAttached() "{{{2
+    if exists("g:checkattach_once") &&
+    \ g:checkattach_once =~? 'y' &&
+    \ search('^Attach: ', 'nb')
+	return 1
+    else
+	return 0
+    endif
+endfu
 fu! <SID>CheckAttach() "{{{2
     " This function checks your mail for the words specified in
     " check, and if it find them, you'll be asked to attach
@@ -116,18 +125,26 @@ fu! <SID>CheckAttach() "{{{2
 	call <SID>WriteBuf(v:cmdbang)
 	return
     endif
-    let oldPos=winsaveview()
-    let ans=1
-    let val = join(split(escape(s:attach_check,' \.+*'), ','),'\|')
+    let s:oldpos = winsaveview()
     1
+    " Needed for function <sid>CheckNewLastLine()
+    let s:header_end = search('^$', 'W')
+    let s:lastline = line('$')
+    1
+    let val = join(split(escape(s:attach_check,' \.+*'), ','),'\|')
     let pat = '\(^\s*>\+.*\)\@<!\c\%(' . val . '\)'
     let prompt = "Attach file: (leave empty to abort): "
     if !empty(s:external_file_browser)
 	let prompt = substitute(prompt, ')', ', Space starts filebrowser)', '')
-	let prompt2 = substitute(prompt, 'file', 'another &', '')
     endif
+    let prompt2 = substitute(prompt, 'file', 'another &', '')
+
+    " Search starting at the line, that contains the subject
+    call search('^Subject:', 'W')
+    let subj = getpos('.')
+    let ans=1
     " don't match in the quoted part of the message
-    if search(pat, 'W')
+    if search(pat, 'W') && !<sid>CheckAlreadyAttached()
 	" Delete old highlighting, don't pollute buffer with matches
 	if exists("s:matchid")
 	    "for i in s:matchid | call matchdelete(i) | endfor
@@ -138,7 +155,7 @@ fu! <SID>CheckAttach() "{{{2
 	redr!
 	let ans=input(prompt, "", "file")
         while (ans != '') && (ans != 'n')
-	    norm! gg}-
+	    norm! }-
 	    if empty(s:external_file_browser)
 		let list = split(expand(ans), "\n")
 		for attach in list
@@ -146,16 +163,22 @@ fu! <SID>CheckAttach() "{{{2
 			\ escape(attach, " \t\\"))
 		    redraw
 		endfor
-		let ans=input(prompt2, "", "file")
+		if <sid>CheckAlreadyAttached()
+		    let ans='n'
+		else
+		    let ans=input(prompt2, "", "file")
+		endif
 	    else
 		call <sid>ExternalFileBrowser(isdirectory(ans) ? ans : 
 			\ fnamemodify(ans, ':h'))
 		let ans='n'
 	    endif
+	    call setpos('.', subj)
         endwhile
+	call <SID>CheckNewLastLine()
     endif
     call <SID>WriteBuf(v:cmdbang)
-    call winrestview(oldPos)
+    call winrestview(s:oldpos)
 endfu
 
 fu! <SID>ExternalFileBrowser(pat) "{{{2
@@ -165,7 +188,7 @@ fu! <SID>ExternalFileBrowser(pat) "{{{2
     redr!
     if filereadable(s:external_choosefile)
 	call append('.', map(readfile(s:external_choosefile), '"Attach: ".
-	    \escape(v:val, " \t\\")'))
+	    \ escape(v:val, " \t\\")'))
 	call delete(s:external_choosefile)
     endif
 endfu
@@ -177,11 +200,11 @@ fu! <SID>AttachFile(pattern) "{{{2
 	return
     endif
 
-    let oldpos=winsaveview()
+    let s:oldpos = winsaveview()
     1
-    let header_end=search('^$', 'W')
+    let s:header_end = search('^$', 'W')
     norm! -
-    let lastline=line('$')
+    let s:lastline = line('$')
 
     if !empty(s:external_file_browser)
 	call <sid>ExternalFileBrowser(isdirectory(a:pattern) ? a:pattern :
@@ -195,16 +218,20 @@ fu! <SID>AttachFile(pattern) "{{{2
 	    endfor
 	endfor
     endif
-    let newlastline=line('$')
+    call <SID>CheckNewLastLine()
+    call winrestview(s:oldpos)
+endfun
+
+fu! <SID>CheckNewLastLine() "{{{2
+    let s:newlastline=line('$')
     " Adding text above, means, we need to adjust
     " the cursor position from the oldpos dictionary. 
     " Should oldpos.topline also be adjusted ?
-    let oldpos.lnum+=newlastline-lastline
-    if oldpos.topline > header_end
-	let oldpos.topline+=newlastline-lastline
+    let s:oldpos.lnum += s:newlastline - s:lastline
+    if s:oldpos.topline > s:header_end
+	let s:oldpos.topline += s:newlastline - s:lastline
     endif
-    call winrestview(oldpos)
-endfun
+endfu
 
 " Define Commands: "{{{1
 " Define commands that will disable and enable the plugin.
