@@ -91,7 +91,7 @@ fu! <SID>AutoCmd() "{{{2
     " Enable Auto command
     if !empty("s:load_autocmd") && s:load_autocmd 
 	augroup CheckAttach  
-	    au! BufWriteCmd * :call <SID>CheckAttach() 
+	    au! BufWriteCmd <buffer> :call <SID>CheckAttach() 
 	augroup END
     else
 	silent! au! CheckAttach BufWriteCmd *
