@@ -77,7 +77,8 @@ fu! <SID>Init() "{{{2
 
     " Enable Autocommand per default
     let s:load_autocmd = exists("g:checkattach_autocmd") ? 
-	\ g:checkattach_autocmd : 1
+	\ g:checkattach_autocmd : exists("s:load_autocmd") ? 
+	\ s:load_autocmd : 1
 endfun
 
 fu! <SID>TriggerAuCmd(enable) "{{{2
@@ -94,7 +95,7 @@ fu! <SID>AutoCmd() "{{{2
 	    au! BufWriteCmd <buffer> :call <SID>CheckAttach() 
 	augroup END
     else
-	silent! au! CheckAttach BufWriteCmd *
+	silent! au! CheckAttach BufWriteCmd <buffer>
 	silent! augroup! CheckAttach
         call map(s:matchid, 'matchdelete(v:val)')
 	unlet! s:matchid
