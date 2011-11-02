@@ -38,7 +38,7 @@ endfun
 
 fu! <SID>Init() "{{{2
     " List of highlighted matches
-    let s:matchid=[]
+    let s:matchid = []
 
     " On which keywords to trigger, comma separated list of keywords
     let s:attach_check = 'attach,attachment,angehängt,Anhang'
@@ -109,9 +109,11 @@ fu! <SID>WriteBuf(bang) "{{{2
 endfu
 
 fu! <SID>CheckAlreadyAttached() "{{{2
+    " Cursor should be at the subject line,
+    " so Attach-header line should be below current position.
     if exists("g:checkattach_once") &&
     \ g:checkattach_once =~? 'y' &&
-    \ search('^Attach: ', 'nb')
+    \ search('^Attach: ', 'nW')
 	return 1
     else
 	return 0
@@ -145,13 +147,13 @@ fu! <SID>CheckAttach() "{{{2
     " Search starting at the line, that contains the subject
     call search('^Subject:', 'W')
     let subj = getpos('.')
-    let ans=1
+    let ans = 1
     if search(pat, 'nW') && !<sid>CheckAlreadyAttached()
 	" Delete old highlighting, don't pollute buffer with matches
 	if exists("s:matchid")
 	    "for i in s:matchid | call matchdelete(i) | endfor
 	    map(s:matchid, 'matchdelete(v:val)')
-	    let s:matchid=[]
+	    let s:matchid = []
 	endif
 	call add(s:matchid,matchadd('WildMenu', pat))
 	redr!
@@ -166,14 +168,14 @@ fu! <SID>CheckAttach() "{{{2
 		    redraw
 		endfor
 		if <sid>CheckAlreadyAttached()
-		    let ans='n'
+		    let ans = 'n'
 		else
-		    let ans=input(prompt2, "", "file")
+		    let ans = input(prompt2, "", "file")
 		endif
 	    else
 		call <sid>ExternalFileBrowser(isdirectory(ans) ? ans : 
 			\ fnamemodify(ans, ':h'))
-		let ans='n'
+		let ans = 'n'
 	    endif
 	    call setpos('.', subj)
         endwhile
@@ -213,7 +215,7 @@ fu! <SID>AttachFile(pattern) "{{{2
 	    \ fnamemodify(a:pattern, ':h'))
     else "empty(a:pattern)
 	for item in split(a:pattern, ' ')
-	    let list=split(expand(item), "\n")
+	    let list = split(expand(item), "\n")
 	    for file in list
 		call append('.', 'Attach: ' . escape(file, " \t\\"))
 		redraw!
@@ -225,13 +227,15 @@ fu! <SID>AttachFile(pattern) "{{{2
 endfun
 
 fu! <SID>CheckNewLastLine() "{{{2
-    let s:newlastline=line('$')
+    let s:newlastline = line('$')
     " Adding text above, means, we need to adjust
     " the cursor position from the oldpos dictionary. 
     " Should oldpos.topline also be adjusted ?
-    let s:oldpos.lnum += s:newlastline - s:lastline
-    if s:oldpos.topline > s:header_end
-	let s:oldpos.topline += s:newlastline - s:lastline
+    if s:oldpos.lnum >= s:header_end
+	let s:oldpos.lnum += s:newlastline - s:lastline
+	if s:oldpos.topline > s:header_end
+	    let s:oldpos.topline += s:newlastline - s:lastline
+	endif
     endif
 endfu
 
