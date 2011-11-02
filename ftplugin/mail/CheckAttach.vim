@@ -146,7 +146,7 @@ fu! <SID>CheckAttach() "{{{2
     call search('^Subject:', 'W')
     let subj = getpos('.')
     let ans=1
-    if search(pat, 'W') && !<sid>CheckAlreadyAttached()
+    if search(pat, 'nW') && !<sid>CheckAlreadyAttached()
 	" Delete old highlighting, don't pollute buffer with matches
 	if exists("s:matchid")
 	    "for i in s:matchid | call matchdelete(i) | endfor
@@ -155,7 +155,7 @@ fu! <SID>CheckAttach() "{{{2
 	endif
 	call add(s:matchid,matchadd('WildMenu', pat))
 	redr!
-	let ans=input(prompt, "", "file")
+	let ans = input(prompt, "", "file")
         while (ans != '') && (ans != 'n')
 	    norm! }-
 	    if empty(s:external_file_browser)
