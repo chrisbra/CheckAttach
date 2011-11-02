@@ -2,7 +2,7 @@
 UseVimball
 finish
 ftplugin/mail/CheckAttach.vim	[[[1
-208
+255
 " Vim plugin for checking attachments with mutt
 " Maintainer:  Christian Brabandt <cb@256bit.org>
 " Last Change: Tue, 25 Oct 2011 21:58:59 +0200
@@ -36,13 +36,14 @@ fu! <SID>WarningMsg(msg) "{{{2
     else
 	    echomsg msg
     endif
+    sleep 1
     echohl Normal
     let v:errmsg = msg
 endfun
 
 fu! <SID>Init() "{{{2
     " List of highlighted matches
-    let s:matchid=[]
+    let s:matchid = []
 
     " On which keywords to trigger, comma separated list of keywords
     let s:attach_check = 'attach,attachment,angehängt,Anhang'
@@ -53,26 +54,36 @@ fu! <SID>Init() "{{{2
     let s:external_file_browser = exists("g:checkattach_filebrowser") ? 
 	\ g:checkattach_filebrowser : ''
 
-    let s:external_choosefile = fnameescape(tempname())
-    if s:external_file_browser == 'ranger'
-	if system(s:external_file_browser . ' --choosefiles=' .
-		\ s:external_choosefile . ' --version ') =~
-		\ 'no such option: --choosefiles'
-	    let s:external_file_browser = 'ranger --choosefile=' .
-		\ s:external_choosefile
-	else
-	    let s:external_file_browser = 'ranger --choosefiles=' .
-		\ s:external_choosefile
+    if !empty(s:external_file_browser)
+	let s:external_choosefile = fnameescape(tempname())
+	if s:external_file_browser == 'ranger'
+	    if system(s:external_file_browser . ' --choosefiles=' .
+		    \ s:external_choosefile . ' --version ') =~
+		    \ 'no such option: --choosefiles'
+		let s:external_file_browser = 'ranger --choosefile=' .
+		    \ s:external_choosefile
+	    else
+		let s:external_file_browser = 'ranger --choosefiles=' .
+		    \ s:external_choosefile
+	    endif
 	endif
-    endif
-    if s:external_file_browser =~ '%s'
-	let s:external_file_browser = substitute(s:external_file_browser,
-	    \ '%s', s:external_choosefile, 'g')
+	if s:external_file_browser =~ '%s'
+	    let s:external_file_browser = substitute(s:external_file_browser,
+		\ '%s', s:external_choosefile, 'g')
+	endif
+	" Check that the part until the first space is executable
+	let binary = matchstr(s:external_file_browser,
+		    \ '^[^[:blank:]\\]\+\(\\\s\S\+\)\?')
+	if !executable(binary)
+	    call <sid>WarningMsg(binary . ' is not executable!')
+	    let s:external_file_browser = ''
+	endif
     endif
 
     " Enable Autocommand per default
     let s:load_autocmd = exists("g:checkattach_autocmd") ? 
-	\ g:checkattach_autocmd : 1
+	\ g:checkattach_autocmd : exists("s:load_autocmd") ? 
+	\ s:load_autocmd : 1
 endfun
 
 fu! <SID>TriggerAuCmd(enable) "{{{2
@@ -86,10 +97,10 @@ fu! <SID>AutoCmd() "{{{2
     " Enable Auto command
     if !empty("s:load_autocmd") && s:load_autocmd 
 	augroup CheckAttach  
-	    au! BufWriteCmd * :call <SID>CheckAttach() 
+	    au! BufWriteCmd <buffer> :call <SID>CheckAttach() 
 	augroup END
     else
-	silent! au! CheckAttach BufWriteCmd *
+	silent! au! CheckAttach BufWriteCmd <buffer>
 	silent! augroup! CheckAttach
         call map(s:matchid, 'matchdelete(v:val)')
 	unlet! s:matchid
@@ -102,6 +113,18 @@ fu! <SID>WriteBuf(bang) "{{{2
     setl nomod
 endfu
 
+fu! <SID>CheckAlreadyAttached() "{{{2
+    " Cursor should be at the subject line,
+    " so Attach-header line should be below current position.
+    if exists("g:checkattach_once") &&
+    \ g:checkattach_once =~? 'y' &&
+    \ search('^Attach: ', 'nW')
+	return 1
+    else
+	return 0
+    endif
+endfu
+
 fu! <SID>CheckAttach() "{{{2
     " This function checks your mail for the words specified in
     " check, and if it find them, you'll be asked to attach
@@ -111,24 +134,37 @@ fu! <SID>CheckAttach() "{{{2
 	call <SID>WriteBuf(v:cmdbang)
 	return
     endif
-    let oldPos=winsaveview()
-    let ans=1
-    let val = join(split(escape(s:attach_check,' \.+*'), ','),'\|')
+    let s:oldpos = winsaveview()
     1
-    let pat = '\(^\s*>\+.*\)\@<!\c\%(' . val . '\)'
+    " Needed for function <sid>CheckNewLastLine()
+    let s:header_end = search('^$', 'W')
+    let s:lastline = line('$')
+    1
+    let val = join(split(escape(s:attach_check,' \.+*'), ','),'\|')
     " don't match in the quoted part of the message
-    if search(pat, 'W')
+    let pat = '\(^\s*>\+.*\)\@<!\c\%(' . val . '\)'
+    let prompt = "Attach file: (leave empty to abort): "
+    if !empty(s:external_file_browser)
+	let prompt = substitute(prompt, ')', ', Space starts filebrowser)', '')
+    endif
+    let prompt2 = substitute(prompt, 'file', 'another &', '')
+
+    " Search starting at the line, that contains the subject
+    call search('^Subject:', 'W')
+    let subj = getpos('.')
+    let ans = 1
+    if search(pat, 'nW') && !<sid>CheckAlreadyAttached()
 	" Delete old highlighting, don't pollute buffer with matches
 	if exists("s:matchid")
 	    "for i in s:matchid | call matchdelete(i) | endfor
 	    map(s:matchid, 'matchdelete(v:val)')
-	    let s:matchid=[]
+	    let s:matchid = []
 	endif
 	call add(s:matchid,matchadd('WildMenu', pat))
 	redr!
-        let ans=input("Attach file: (leave empty to abort): ", "", "file")
+	let ans = input(prompt, "", "file")
         while (ans != '') && (ans != 'n')
-	    norm! gg}-
+	    norm! }-
 	    if empty(s:external_file_browser)
 		let list = split(expand(ans), "\n")
 		for attach in list
@@ -136,17 +172,22 @@ fu! <SID>CheckAttach() "{{{2
 			\ escape(attach, " \t\\"))
 		    redraw
 		endfor
-		let ans=input("Attach another file?: (leave empty to abort): "
-		    \ , "", "file")
+		if <sid>CheckAlreadyAttached()
+		    let ans = 'n'
+		else
+		    let ans = input(prompt2, "", "file")
+		endif
 	    else
 		call <sid>ExternalFileBrowser(isdirectory(ans) ? ans : 
 			\ fnamemodify(ans, ':h'))
-		let ans='n'
+		let ans = 'n'
 	    endif
+	    call setpos('.', subj)
         endwhile
+	call <SID>CheckNewLastLine()
     endif
     call <SID>WriteBuf(v:cmdbang)
-    call winrestview(oldPos)
+    call winrestview(s:oldpos)
 endfu
 
 fu! <SID>ExternalFileBrowser(pat) "{{{2
@@ -156,7 +197,7 @@ fu! <SID>ExternalFileBrowser(pat) "{{{2
     redr!
     if filereadable(s:external_choosefile)
 	call append('.', map(readfile(s:external_choosefile), '"Attach: ".
-	    \escape(v:val, " \t\\")'))
+	    \ escape(v:val, " \t\\")'))
 	call delete(s:external_choosefile)
     endif
 endfu
@@ -168,34 +209,40 @@ fu! <SID>AttachFile(pattern) "{{{2
 	return
     endif
 
-    let oldpos=winsaveview()
+    let s:oldpos = winsaveview()
     1
-    let header_end=search('^$', 'W')
+    let s:header_end = search('^$', 'W')
     norm! -
-    let lastline=line('$')
+    let s:lastline = line('$')
 
     if !empty(s:external_file_browser)
 	call <sid>ExternalFileBrowser(isdirectory(a:pattern) ? a:pattern :
 	    \ fnamemodify(a:pattern, ':h'))
     else "empty(a:pattern)
 	for item in split(a:pattern, ' ')
-	    let list=split(expand(item), "\n")
+	    let list = split(expand(item), "\n")
 	    for file in list
 		call append('.', 'Attach: ' . escape(file, " \t\\"))
 		redraw!
 	    endfor
 	endfor
     endif
-    let newlastline=line('$')
+    call <SID>CheckNewLastLine()
+    call winrestview(s:oldpos)
+endfun
+
+fu! <SID>CheckNewLastLine() "{{{2
+    let s:newlastline = line('$')
     " Adding text above, means, we need to adjust
     " the cursor position from the oldpos dictionary. 
     " Should oldpos.topline also be adjusted ?
-    let oldpos.lnum+=newlastline-lastline
-    if oldpos.topline > header_end
-	let oldpos.topline+=newlastline-lastline
+    if s:oldpos.lnum >= s:header_end
+	let s:oldpos.lnum += s:newlastline - s:lastline
+	if s:oldpos.topline > s:header_end
+	    let s:oldpos.topline += s:newlastline - s:lastline
+	endif
     endif
-    call winrestview(oldpos)
-endfun
+endfu
 
 " Define Commands: "{{{1
 " Define commands that will disable and enable the plugin.
@@ -212,7 +259,7 @@ let &cpo = s:cpo_save
 unlet s:cpo_save
 " vim: set foldmethod=marker: 
 doc/CheckAttach.txt	[[[1
-174
+199
 *CheckAttach.txt*  Check attachments when using mutt - Vers 0.8  Mar 02, 2010
 
 Author:  Christian Brabandt <cb@256bit.org>
@@ -242,10 +289,11 @@ mails in which you announce to attach some files but actually forget to attach
 the files so that your have to write a second mail which often is quite
 embarrassing.
 
-Therefore this plugin checks for the presence of keywords which indicate that
-an attachment should be attached. If if finds these keywords, the plugin will
-highlight the keywords and ask you for the files to attach, whenever you save
-your mail.
+Therefore this plugin checks for the presence of keywords (but does not
+consider the quoted part of the message, that is, any line that does not start
+with '>') which indicate that an attachment should be attached. If if finds
+these keywords, the plugin will highlight the keywords and ask you for the
+files to attach, whenever you save your mail.
 
 This looks like this:
 Attach file: (leave empty to abort):
@@ -316,6 +364,18 @@ The special parameter '%s' will be replaced by Vim by a temporary filename.
 Again, your filebrowser will be expected to write the selected filenames into
 that file.
 
+3. Check only once
+------------------
+
+You can CheckAttach configure, so that it will only check once until an
+:Attach header is present and on further writes, it will assume that nothing
+needs to be done since you already attached a file. To enable this, simply set
+this variable: >
+
+    :let g:checkattach_once = 'y'
+
+<
+
                                                         *CheckAttach_Problems*
 Problems with CheckAttach
 =========================
@@ -332,10 +392,10 @@ not use filenames containing 8bit letters or only 8bit letters in the same
 encoding as given to the assumed_charset option.
 
                                       *EnableCheckAttach* *DisableCheckAttach*
-You can disable the plugin by issuing the command 
-:DisableCheckAttach
-Enabling the attachment check is then again enabled by issuing
-:EnableCheckAttach
+You can disable the plugin by issuing the command >
+    :DisableCheckAttach
+Enabling the attachment check is then again enabled by issuing >
+    :EnableCheckAttach
 
 If you'd like to suggest adding additional keywords (for your language),
 please contact the author (see first line of this help page).
@@ -348,7 +408,9 @@ only if you use :w it will.
 The plugin also defines the command :AttachFile. This allows you to simply
 attach any number of files, using a glob pattern. So, if you like to attach
 all your pictures from ~/pictures/ you can simply enter: >
+
      :AttachFile ~/pictures/*.jpg
+
 and all jpg files will be attached automatically. You can use <Tab> to
 complete the directory.
 
@@ -358,6 +420,16 @@ complete the directory.
                              for selecting the files (suggested by mutt-users
                              mailinglist)
                            Command definition will be buffer local
+                           Don't check for matches of the keywords in the
+                             quoted of the message (suggested by Sebastian
+                             Tramp, thanks!)
+                           Don't check for matches inside the header (start at
+                             subject line, suggested by Sebastian Tramp,
+                             thanks!)
+                           Only check as long, as no :Attach header is
+                             available when the g:checkattach_once variable is
+                             set (suggested by Sebastian Tramp, thanks!)
+                           Documentation update
    0.12: Oct  25, 2011     Update the plugin (include some changes, that got
                              lost with 0.11)
    0.11: Sep  30, 2011     Make a filetype plugin out of it, it does not
