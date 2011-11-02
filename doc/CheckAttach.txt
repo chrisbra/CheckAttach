@@ -102,6 +102,18 @@ The special parameter '%s' will be replaced by Vim by a temporary filename.
 Again, your filebrowser will be expected to write the selected filenames into
 that file.
 
+3. Check only once
+------------------
+
+You can CheckAttach configure, so that it will only check once until an
+:Attach header is present and on further writes, it will assume that nothing
+needs to be done since you already attached a file. To enable this, simply set
+this variable: >
+
+    :let g:checkattach_once = 'y'
+
+<
+
                                                         *CheckAttach_Problems*
 Problems with CheckAttach
 =========================
@@ -118,10 +130,10 @@ not use filenames containing 8bit letters or only 8bit letters in the same
 encoding as given to the assumed_charset option.
 
                                       *EnableCheckAttach* *DisableCheckAttach*
-You can disable the plugin by issuing the command 
-:DisableCheckAttach
-Enabling the attachment check is then again enabled by issuing
-:EnableCheckAttach
+You can disable the plugin by issuing the command >
+    :DisableCheckAttach
+Enabling the attachment check is then again enabled by issuing >
+    :EnableCheckAttach
 
 If you'd like to suggest adding additional keywords (for your language),
 please contact the author (see first line of this help page).
@@ -134,7 +146,9 @@ only if you use :w it will.
 The plugin also defines the command :AttachFile. This allows you to simply
 attach any number of files, using a glob pattern. So, if you like to attach
 all your pictures from ~/pictures/ you can simply enter: >
+
      :AttachFile ~/pictures/*.jpg
+
 and all jpg files will be attached automatically. You can use <Tab> to
 complete the directory.
 
@@ -145,8 +159,15 @@ complete the directory.
                              mailinglist)
                            Command definition will be buffer local
                            Don't check for matches of the keywords in the
-                             quoted of the message (suggested by Sebastion
+                             quoted of the message (suggested by Sebastian
                              Tramp, thanks!)
+                           Don't check for matches inside the header (start at
+                             subject line, suggested by Sebastian Tramp,
+                             thanks!)
+                           Only check as long, as no :Attach header is
+                             available when the g:checkattach_once variable is
+                             set (suggested by Sebastian Tramp, thanks!)
+                           Documentation update
    0.12: Oct  25, 2011     Update the plugin (include some changes, that got
                              lost with 0.11)
    0.11: Sep  30, 2011     Make a filetype plugin out of it, it does not
