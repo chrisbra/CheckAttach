@@ -1,14 +1,14 @@
 *CheckAttach.txt*  Check attachments when using mutt - Vers 0.8  Mar 02, 2010
 
 Author:  Christian Brabandt <cb@256bit.org>
-Version: 0.12 Tue, 25 Oct 2011 21:58:59 +0200
+Version: 0.13 Tue, 08 Nov 2011 21:58:13 +0100
 Copyright: (c) 2009 by Christian Brabandt               *CheckAttach-copyright*
            The VIM LICENSE applies to CheckAttach.vim and CheckAttach.txt
            (see |copyright|) except use CheckAttach instead of "Vim".
            NO WARRANTY, EXPRESS OR IMPLIED.  USE AT-YOUR-OWN-RISK.
 
 
-==============================================================================
+=============================================================================
                                                                  *CheckAttach*
 1. Functionality
 
@@ -27,10 +27,11 @@ mails in which you announce to attach some files but actually forget to attach
 the files so that your have to write a second mail which often is quite
 embarrassing.
 
-Therefore this plugin checks for the presence of keywords which indicate that
-an attachment should be attached. If if finds these keywords, the plugin will
-highlight the keywords and ask you for the files to attach, whenever you save
-your mail.
+Therefore this plugin checks for the presence of keywords (but does not
+consider the quoted part of the message, that is, any line that does not start
+with '>') which indicate that an attachment should be attached. If if finds
+these keywords, the plugin will highlight the keywords and ask you for the
+files to attach, whenever you save your mail.
 
 This looks like this:
 Attach file: (leave empty to abort):
@@ -39,14 +40,24 @@ At that prompt you can specify any file you'd like to attach. It allows
 filename completion, so you can use <Tab> to let vim complete file paths.
 Additionally you can specify glob patterns and let vim attach all files, that
 match the pattern. So if you enter ~/.vim/plugin/*.vim vim would add for each
-plugin it finds an Attach-header.  If you enter an empty value or "n" (without
-the quotes), no file will be attached.
+plugin it finds an Attach-header. If you enter an empty value or "n" (without
+the quotes), no file will be attached. If you have the plugin configured to
+use an external filebrowser (see point 2 below |CheckAttach-Config|), you need
+to enter at least a space, otherwise the plugin won't attach any file to your
+mail. If you enter a directory, your filebrowser will be called with that
+directory as argument.
 
 The plugin will by default escape blank space in your filename by using '\'.
 mutt before version 1.5.20 had a bug, that would not allow you to add files
 whose filename contain spaces. If you are using mutt version smaller 1.5.20
 this means you would have to rename those files first before attaching them.
 (See mutt bug 3179: http://dev.mutt.org/trac/ticket/3179)
+
+Configuration                                        *CheckAttach-Config*
+=============
+
+1. Specify different keywords
+-----------------------------
 
 You can specify which keywords will be searched by setting the
 g:attach_check_keywords variable. By default this variable is specified as:
@@ -59,9 +70,53 @@ let g:attach_check_keywords =',foobar'
 NOTE: The comma is important. It is used to separate the different keywords
 and needs to be included.
 
+2. Use an external filemanager
+------------------------------
+
+Instead of using Vim to select the files, you can also specify to use an
+external filemanager. It must be configured to write all selected files into a
+temporary file, which in turn will be read in by Vim and put as Attach: header
+into your mail. To use an external filebrowser, use the
+g:checkattach_filebrowser variable.
+
+Let's assume you want to use ranger (http://ranger.nongnu.org/) as external
+file manager. So in your |.vimrc| you put: >
+
+    :let g:checkattach_filebrowser = 'ranger'
+<
+For ranger, Vim will try to determine, whether it supports the --choosefiles
+paramter. This is only supported with Version 1.5.1 of ranger, otherwise, it
+will only support the --choosefile parameter. The difference is when using the
+--chosefile parameter you can only select 1 file to be attached, while
+starting from version 1.5.1 you can attach a list of files. In this case, Vim
+will execute the command 'ranger --choosefile/choosefiles=<tempname>' where
+<tempname> will be substituted by a temporary file that will be created when
+running the command.
+
+You can also force vim to execute a different command, in this case, specify
+the command to be run like this: >
+
+    :let g:checkattach_filebrowser = 'ranger --choosefiles=%s'
+<
+The special parameter '%s' will be replaced by Vim by a temporary filename.
+Again, your filebrowser will be expected to write the selected filenames into
+that file.
+
+3. Check only once
+------------------
+
+You can CheckAttach configure, so that it will only check once until an
+:Attach header is present and on further writes, it will assume that nothing
+needs to be done since you already attached a file. To enable this, simply set
+this variable: >
+
+    :let g:checkattach_once = 'y'
+
+<
+
                                                         *CheckAttach_Problems*
 Problems with CheckAttach
-========================
+=========================
 
 If you try to attach a file, whose name contains 8bit letters, it could be,
 that mutt can't attach that file and instead displays an error message similar
@@ -75,10 +130,10 @@ not use filenames containing 8bit letters or only 8bit letters in the same
 encoding as given to the assumed_charset option.
 
                                       *EnableCheckAttach* *DisableCheckAttach*
-You can disable the plugin by issuing the command 
-:DisableCheckAttach
-Enabling the attachment check is then again enabled by issuing
-:EnableCheckAttach
+You can disable the plugin by issuing the command >
+    :DisableCheckAttach
+Enabling the attachment check is then again enabled by issuing >
+    :EnableCheckAttach
 
 If you'd like to suggest adding additional keywords (for your language),
 please contact the author (see first line of this help page).
@@ -91,12 +146,28 @@ only if you use :w it will.
 The plugin also defines the command :AttachFile. This allows you to simply
 attach any number of files, using a glob pattern. So, if you like to attach
 all your pictures from ~/pictures/ you can simply enter: >
+
      :AttachFile ~/pictures/*.jpg
+
 and all jpg files will be attached automatically. You can use <Tab> to
 complete the directory.
 
 ==============================================================================
 2. CheckAttach History                                   *CheckAttach-history*
+   0.13: Nov 08, 2011      allow plugin to use an external file manager
+                             for selecting the files (suggested by mutt-users
+                             mailinglist)
+                           Command definition will be buffer local
+                           Don't check for matches of the keywords in the
+                             quoted of the message (suggested by Sebastian
+                             Tramp, thanks!)
+                           Don't check for matches inside the header (start at
+                             subject line, suggested by Sebastian Tramp,
+                             thanks!)
+                           Only check as long, as no :Attach header is
+                             available when the g:checkattach_once variable is
+                             set (suggested by Sebastian Tramp, thanks!)
+                           Documentation update
    0.12: Oct  25, 2011     Update the plugin (include some changes, that got
                              lost with 0.11)
    0.11: Sep  30, 2011     Make a filetype plugin out of it, it does not

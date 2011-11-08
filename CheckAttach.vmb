@@ -5,9 +5,9 @@ ftplugin/mail/CheckAttach.vim	[[[1
 255
 " Vim plugin for checking attachments with mutt
 " Maintainer:  Christian Brabandt <cb@256bit.org>
-" Last Change: Tue, 25 Oct 2011 21:58:59 +0200
-" Version:     0.12
-" GetLatestVimScripts: 2796 12 :AutoInstall: CheckAttach.vim
+" Last Change: Tue, 08 Nov 2011 21:58:13 +0100
+" Version:     0.13
+" GetLatestVimScripts: 2796 13 :AutoInstall: CheckAttach.vim
 
 " Plugin folklore "{{{1
 " Exit quickly when:
@@ -263,7 +263,7 @@ doc/CheckAttach.txt	[[[1
 *CheckAttach.txt*  Check attachments when using mutt - Vers 0.8  Mar 02, 2010
 
 Author:  Christian Brabandt <cb@256bit.org>
-Version: 0.12 Tue, 25 Oct 2011 21:58:59 +0200
+Version: 0.13 Tue, 08 Nov 2011 21:58:13 +0100
 Copyright: (c) 2009 by Christian Brabandt               *CheckAttach-copyright*
            The VIM LICENSE applies to CheckAttach.vim and CheckAttach.txt
            (see |copyright|) except use CheckAttach instead of "Vim".
@@ -416,7 +416,7 @@ complete the directory.
 
 ==============================================================================
 2. CheckAttach History                                   *CheckAttach-history*
-   0.13: (unreleased)      allow plugin to use an external file manager
+   0.13: Nov 08, 2011      allow plugin to use an external file manager
                              for selecting the files (suggested by mutt-users
                              mailinglist)
                            Command definition will be buffer local
