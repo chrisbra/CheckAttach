@@ -214,12 +214,16 @@ fu! <SID>AttachFile(pattern) "{{{2
 	call <sid>ExternalFileBrowser(isdirectory(a:pattern) ? a:pattern :
 	    \ fnamemodify(a:pattern, ':h'))
     else "empty(a:pattern)
-	for item in split(a:pattern, ' ')
-	    let list = split(expand(item), "\n")
-	    for file in list
-		call append('.', 'Attach: ' . escape(file, " \t\\"))
-		redraw!
-	    endfor
+	" glob supports returning a list
+	if v:version > 703 || v:version == 703 && has("patch465")
+	    let list = "glob(a:pattern, 1, 1)"
+	else
+	    " glob returns new-line separated items
+	    let list = 'split(glob(a:pattern, 1), "\n")'
+	endif
+	for item in eval(list)
+	    call append('.', 'Attach: '. escape(item, " \t\\"))
+	    redraw!
 	endfor
     endif
     call <SID>CheckNewLastLine()
