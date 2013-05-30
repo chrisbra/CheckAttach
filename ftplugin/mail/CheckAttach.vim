@@ -111,7 +111,7 @@ endfu
 fu! <SID>CheckAlreadyAttached(line) "{{{2
     " argument line = subject line
     let cpos = getpos('.')
-    exe 'a:line'
+    exe a:line
     " Cursor should be at the subject line,
     " so Attach-header line should be below current position.
     if exists("g:checkattach_once") &&
