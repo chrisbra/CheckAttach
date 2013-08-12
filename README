@@ -154,6 +154,8 @@ complete the directory.
 
 ==============================================================================
 2. CheckAttach History                                   *CheckAttach-history*
+   0.15: (unreleased)      don't match Attach: header when trying to look
+                            for matching attachment keywords
    0.14: Jun 16, 2012      Fix issue 2 from github:
                             https://github.com/chrisbra/CheckAttach/issues/2
                             (:AttachFile, does not correctly attach filenames
