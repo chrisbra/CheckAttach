@@ -5,9 +5,9 @@ ftplugin/mail/CheckAttach.vim	[[[1
 265
 " Vim plugin for checking attachments with mutt
 " Maintainer:  Christian Brabandt <cb@256bit.org>
-" Last Change: Sat, 16 Jun 2012 11:42:26 +0200
-" Version:     0.14
-" GetLatestVimScripts: 2796 14 :AutoInstall: CheckAttach.vim
+" Last Change: Wed, 14 Aug 2013 22:24:01 +0200
+" Version:     0.15
+" GetLatestVimScripts: 2796 15 :AutoInstall: CheckAttach.vim
 
 " Plugin folklore "{{{1
 " Exit quickly when:
@@ -269,16 +269,15 @@ let &cpo = s:cpo_save
 unlet s:cpo_save
 " vim: set foldmethod=marker: 
 doc/CheckAttach.txt	[[[1
-205
-*CheckAttach.txt*  Check attachments when using mutt - Vers 0.8  Mar 02, 2010
+237
+*CheckAttach.txt*  Check attachments when using mutt
 
 Author:  Christian Brabandt <cb@256bit.org>
-Version: 0.14 Sat, 16 Jun 2012 11:42:26 +0200
-Copyright: (c) 2009 by Christian Brabandt               *CheckAttach-copyright*
+Version: 0.15 Wed, 14 Aug 2013 22:24:01 +0200
+Copyright: (c) 2009-2013 by Christian Brabandt            *CheckAttach-copyright*
            The VIM LICENSE applies to CheckAttach.vim and CheckAttach.txt
            (see |copyright|) except use CheckAttach instead of "Vim".
            NO WARRANTY, EXPRESS OR IMPLIED.  USE AT-YOUR-OWN-RISK.
-
 
 =============================================================================
                                                                  *CheckAttach*
@@ -426,52 +425,85 @@ complete the directory.
 
 ==============================================================================
 2. CheckAttach History                                   *CheckAttach-history*
-   0.15: (unreleased)      don't match Attach: header when trying to look
-                            for matching attachment keywords
-   0.14: Jun 16, 2012      Fix issue 2 from github:
-                            https://github.com/chrisbra/CheckAttach/issues/2
-                            (:AttachFile, does not correctly attach filenames
-                            with spaces, reported by daaugusto, thanks!)
-   0.13: Nov 08, 2011      allow plugin to use an external file manager
-                             for selecting the files (suggested by mutt-users
-                             mailinglist)
-                           Command definition will be buffer local
-                           Don't check for matches of the keywords in the
-                             quoted of the message (suggested by Sebastian
-                             Tramp, thanks!)
-                           Don't check for matches inside the header (start at
-                             subject line, suggested by Sebastian Tramp,
-                             thanks!)
-                           Only check as long, as no :Attach header is
-                             available when the g:checkattach_once variable is
-                             set (suggested by Sebastian Tramp, thanks!)
-                           Documentation update
-   0.12: Oct  25, 2011     Update the plugin (include some changes, that got
-                             lost with 0.11)
-   0.11: Sep  30, 2011     Make a filetype plugin out of it, it does not
-                             make sense to have it as plugin, since its only
-                             use is with mutt (aka ft: mail)
-                           Documentation update
-   0.10: Jan  17, 2011     Spelling fixes by Scott Stevenson (Thanks!)
-    0.9: Dec  17, 2010     new command |:AttachFile|
-    0.8: Nov  29, 2010     Make ftplugin instead of plugin,
-                           don't trigger check of filetypes
-                           clear matchlist on next run
-                           code cleanup
-    0.7: May  05, 2010     Force checking the filetype
-    0.6: May  05, 2010     Force filetype detection, which did prevent
-                             of the plugin to be working correctly
-                           Created a public github repository at
-                             http://github.com/chrisbra/CheckAttach
-                           Small changes to the documentation
-    0.5: Mar  02, 2010     Search without matching case
-    0.4: Jan  26, 2010     Highlight matching keywords,
-                           use g:attach_check_ft to specify for which filetypes
-                           to enable the plugin
-    0.3: Oct   1, 2009     Fixed Copyright statement, 
-                           enabled GetLatestScripts
-    0.2: Sept 29, 2009     Added Documentation
-    0.1: Sept 29, 2009     First working version, using simple commands
+   0.15: Aug 13, 2013 "{{{1
+
+   - don't match Attach: header when trying to look for matching attachment
+     keywords
+
+   0.14: Jun 16, 2012 "{{{1
+
+   - Fix issue 2 from github: https://github.com/chrisbra/CheckAttach/issues/2
+     (:AttachFile, does not correctly attach filenames with spaces, reported by
+     daaugusto, thanks!)
+
+   0.13: Nov 08, 2011 "{{{1
+
+    - allow plugin to use an external file manager for selecting the files
+      (suggested by mutt-users mailinglist)
+    - Command definition will be buffer local
+    - Don't check for matches of the keywords in the quoted of the message
+      (suggested by Sebastian Tramp, thanks!)
+    - Don't check for matches inside the header (start at subject line,
+      suggested by Sebastian Tramp, thanks!)
+    - Only check as long, as no :Attach header is available when the
+      g:checkattach_once variable is set (suggested by Sebastian Tramp,
+      thanks!)
+    - Documentation update
+
+   0.12: Oct  25, 2011 "{{{1
+
+    - Update the plugin (include some changes, that got lost with 0.11)
+
+   0.11: Sep  30, 2011 "{{{1
+
+    - Make a filetype plugin out of it, it does not make sense to have it as
+      plugin, since its only use is with mutt (aka ft: mail)
+    - Documentation update
+
+   0.10: Jan  17, 2011 "{{{1
+
+    - Spelling fixes by Scott Stevenson (Thanks!)
+
+    0.9: Dec  17, 2010 "{{{1
+
+    -  new command |:AttachFile|
+
+    0.8: Nov  29, 2010 "{{{1
+
+    - Make ftplugin instead of plugin, don't trigger check of filetypes clear
+      matchlist on next run code cleanup
+
+    0.7: May  05, 2010 "{{{1
+
+    - Force checking the filetype
+
+    0.6: May  05, 2010 "{{{1
+
+    - Force filetype detection, which did prevent of the plugin to be working
+      correctly
+    - Created a public github repository at http://github.com/chrisbra/CheckAttach
+    - Small changes to the documentation
+
+    0.5: Mar  02, 2010 "{{{1
+    
+    - Search without matching case
+
+    0.4: Jan  26, 2010 "{{{1
+
+    - Highlight matching keywords, use g:attach_check_ft to specify for which
+      filetypes to enable the plugin
+
+    0.3: Oct   1, 2009 "{{{1
+
+    - Fixed Copyright statement, enabled GetLatestScripts
+
+    0.2: Sept 29, 2009 "{{{1
+    
+    - Added Documentation
+
+    0.1: Sept 29, 2009 "{{{1
+    
+    - First working version, using simple commands
 
 ==============================================================================
 vim:tw=78:ts=8:ft=help:et
