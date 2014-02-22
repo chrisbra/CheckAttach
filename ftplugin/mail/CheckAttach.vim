@@ -203,7 +203,7 @@ fu! <SID>ExternalFileBrowser(pat) "{{{2
     endif
 endfu
 
-fu! <SID>AttachFile(pattern) "{{{2
+fu! <SID>AttachFile(pattern, ...) "{{{2
     call <sid>Init()
     if empty(a:pattern) && empty(s:external_file_browser)
 	call <sid>WarningMsg("No pattern supplied, can't attach a file!")
@@ -215,21 +215,31 @@ fu! <SID>AttachFile(pattern) "{{{2
     let s:header_end = search('^$', 'W')
     norm! -
     let s:lastline = line('$')
+    let rest = copy(a:000)
 
+    let list = []
     if !empty(s:external_file_browser)
 	call <sid>ExternalFileBrowser(isdirectory(a:pattern) ? a:pattern :
 	    \ fnamemodify(a:pattern, ':h'))
     else "empty(a:pattern)
 	" glob supports returning a list
 	if v:version > 703 || v:version == 703 && has("patch465")
-	    let list = "glob(a:pattern, 1, 1)"
+	    let list = ["glob(a:pattern, 1, 1)"]
+	    if !empty(rest)
+		let list = list + map(rest, '"glob(''".v:val. "'', 1, 1)"')
+	    endif
 	else
 	    " glob returns new-line separated items
-	    let list = 'split(glob(a:pattern, 1), "\n")'
+	    let list = ['split(glob(a:pattern, 1), "\n")']
+	    if !empty(rest)
+		let list = list + map(rest, '"split(glob(\"".v:val. ''", 1), "\\n")''')
+	    endif
 	endif
-	for item in eval(list)
-	    call append('.', 'Attach: '. escape(item, " \t\\"))
-	    redraw!
+	for val in list
+	    for item in eval(val)
+		call append('.', 'Attach: '. escape(item, " \t\\"))
+		redraw!
+	    endfor
 	endfor
     endif
     call <SID>CheckNewLastLine()
@@ -254,7 +264,7 @@ endfu
 command! -buffer EnableCheckAttach  :call <SID>TriggerAuCmd(1)
 command! -buffer DisableCheckAttach :call <SID>TriggerAuCmd(0)
 command! -buffer -nargs=* -complete=file  AttachFile :call
-	    \ <SID>AttachFile(<q-args>)
+	    \ <SID>AttachFile(<f-args>)
 
 " Call function to set everything up "{{{2
 call <SID>TriggerAuCmd(s:load_autocmd)

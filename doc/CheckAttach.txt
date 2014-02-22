@@ -110,7 +110,6 @@ needs to be done since you already attached a file. To enable this, simply set
 this variable: >
 
     :let g:checkattach_once = 'y'
-
 <
 
                                                         *CheckAttach_Problems*
@@ -151,8 +150,17 @@ all your pictures from ~/pictures/ you can simply enter: >
 and all jpg files will be attached automatically. You can use <Tab> to
 complete the directory.
 
+Additionally you can specify different patterns at once:
+
+    :AttachFile ~/pictues/*.jpg ~/Bilder/*.jpg
+
 ==============================================================================
 2. CheckAttach History                                   *CheckAttach-history*
+   0.16: (unreleased) "{{{1
+   - allow to specify several patterns after |:AttachFile| (issue #4,
+     https://github.com/chrisbra/CheckAttach/issues/4 reported by AguirreIF,
+     thanks!)
+
    0.15: Aug 13, 2013 "{{{1
 
    - don't match Attach: header when trying to look for matching attachment
