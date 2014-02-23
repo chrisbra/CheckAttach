@@ -203,9 +203,9 @@ fu! <SID>ExternalFileBrowser(pat) "{{{2
     endif
 endfu
 
-fu! <SID>AttachFile(pattern, ...) "{{{2
+fu! <SID>AttachFile(...) "{{{2
     call <sid>Init()
-    if empty(a:pattern) && empty(s:external_file_browser)
+    if empty(a:000) && empty(s:external_file_browser)
 	call <sid>WarningMsg("No pattern supplied, can't attach a file!")
 	return
     endif
@@ -221,18 +221,16 @@ fu! <SID>AttachFile(pattern, ...) "{{{2
     if !empty(s:external_file_browser)
 	call <sid>ExternalFileBrowser(isdirectory(a:pattern) ? a:pattern :
 	    \ fnamemodify(a:pattern, ':h'))
-    else "empty(a:pattern)
+    else
 	" glob supports returning a list
 	if v:version > 703 || v:version == 703 && has("patch465")
-	    let list = ["glob(a:pattern, 1, 1)"]
 	    if !empty(rest)
-		let list = list + map(rest, '"glob(''".v:val. "'', 1, 1)"')
+		let list = map(rest, '"glob(''".v:val. "'', 1, 1)"')
 	    endif
 	else
 	    " glob returns new-line separated items
-	    let list = ['split(glob(a:pattern, 1), "\n")']
 	    if !empty(rest)
-		let list = list + map(rest, '"split(glob(\"".v:val. ''", 1), "\\n")''')
+		let list = map(rest, '"split(glob(\"".v:val. ''", 1), "\\n")''')
 	    endif
 	endif
 	for val in list
