@@ -2,12 +2,12 @@
 UseVimball
 finish
 ftplugin/mail/CheckAttach.vim	[[[1
-265
+273
 " Vim plugin for checking attachments with mutt
 " Maintainer:  Christian Brabandt <cb@256bit.org>
-" Last Change: Wed, 14 Aug 2013 22:24:01 +0200
-" Version:     0.15
-" GetLatestVimScripts: 2796 15 :AutoInstall: CheckAttach.vim
+" Last Change: Thu, 27 Mar 2014 23:24:37 +0100
+" Version:     0.16
+" GetLatestVimScripts: 2796 16 :AutoInstall: CheckAttach.vim
 
 " Plugin folklore "{{{1
 " Exit quickly when:
@@ -208,9 +208,9 @@ fu! <SID>ExternalFileBrowser(pat) "{{{2
     endif
 endfu
 
-fu! <SID>AttachFile(pattern) "{{{2
+fu! <SID>AttachFile(...) "{{{2
     call <sid>Init()
-    if empty(a:pattern) && empty(s:external_file_browser)
+    if empty(a:000) && empty(s:external_file_browser)
 	call <sid>WarningMsg("No pattern supplied, can't attach a file!")
 	return
     endif
@@ -220,21 +220,29 @@ fu! <SID>AttachFile(pattern) "{{{2
     let s:header_end = search('^$', 'W')
     norm! -
     let s:lastline = line('$')
+    let rest = copy(a:000)
 
+    let list = []
     if !empty(s:external_file_browser)
 	call <sid>ExternalFileBrowser(isdirectory(a:pattern) ? a:pattern :
 	    \ fnamemodify(a:pattern, ':h'))
-    else "empty(a:pattern)
+    else
 	" glob supports returning a list
 	if v:version > 703 || v:version == 703 && has("patch465")
-	    let list = "glob(a:pattern, 1, 1)"
+	    if !empty(rest)
+		let list = map(rest, '"glob(''".v:val. "'', 1, 1)"')
+	    endif
 	else
 	    " glob returns new-line separated items
-	    let list = 'split(glob(a:pattern, 1), "\n")'
+	    if !empty(rest)
+		let list = map(rest, '"split(glob(\"".v:val. ''", 1), "\\n")''')
+	    endif
 	endif
-	for item in eval(list)
-	    call append('.', 'Attach: '. escape(item, " \t\\"))
-	    redraw!
+	for val in list
+	    for item in eval(val)
+		call append('.', 'Attach: '. escape(item, " \t\\"))
+		redraw!
+	    endfor
 	endfor
     endif
     call <SID>CheckNewLastLine()
@@ -259,7 +267,7 @@ endfu
 command! -buffer EnableCheckAttach  :call <SID>TriggerAuCmd(1)
 command! -buffer DisableCheckAttach :call <SID>TriggerAuCmd(0)
 command! -buffer -nargs=* -complete=file  AttachFile :call
-	    \ <SID>AttachFile(<q-args>)
+	    \ <SID>AttachFile(<f-args>)
 
 " Call function to set everything up "{{{2
 call <SID>TriggerAuCmd(s:load_autocmd)
@@ -269,11 +277,11 @@ let &cpo = s:cpo_save
 unlet s:cpo_save
 " vim: set foldmethod=marker: 
 doc/CheckAttach.txt	[[[1
-237
+245
 *CheckAttach.txt*  Check attachments when using mutt
 
 Author:  Christian Brabandt <cb@256bit.org>
-Version: 0.15 Wed, 14 Aug 2013 22:24:01 +0200
+Version: 0.16 Thu, 27 Mar 2014 23:24:37 +0100
 Copyright: (c) 2009-2013 by Christian Brabandt            *CheckAttach-copyright*
            The VIM LICENSE applies to CheckAttach.vim and CheckAttach.txt
            (see |copyright|) except use CheckAttach instead of "Vim".
@@ -382,7 +390,6 @@ needs to be done since you already attached a file. To enable this, simply set
 this variable: >
 
     :let g:checkattach_once = 'y'
-
 <
 
                                                         *CheckAttach_Problems*
@@ -423,8 +430,17 @@ all your pictures from ~/pictures/ you can simply enter: >
 and all jpg files will be attached automatically. You can use <Tab> to
 complete the directory.
 
+Additionally you can specify different patterns at once:
+
+    :AttachFile ~/pictues/*.jpg ~/Bilder/*.jpg
+
 ==============================================================================
 2. CheckAttach History                                   *CheckAttach-history*
+   0.16: Mar 27, 2014 "{{{1
+   - allow to specify several patterns after |:AttachFile| (issue #4,
+     https://github.com/chrisbra/CheckAttach/issues/4 reported by AguirreIF,
+     thanks!)
+
    0.15: Aug 13, 2013 "{{{1
 
    - don't match Attach: header when trying to look for matching attachment
