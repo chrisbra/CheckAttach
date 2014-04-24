@@ -2,7 +2,7 @@
 UseVimball
 finish
 ftplugin/mail/CheckAttach.vim	[[[1
-273
+275
 " Vim plugin for checking attachments with mutt
 " Maintainer:  Christian Brabandt <cb@256bit.org>
 " Last Change: Thu, 27 Mar 2014 23:24:37 +0100
@@ -133,6 +133,7 @@ fu! <SID>CheckAttach() "{{{2
     " This function checks your mail for the words specified in
     " check, and if it find them, you'll be asked to attach
     " a file.
+    " Called from a BufWrite autocommand
     call <SID>Init()
     if empty("s:attach_check") || v:cmdbang
 	call <SID>WriteBuf(v:cmdbang)
@@ -175,7 +176,7 @@ fu! <SID>CheckAttach() "{{{2
 		let list = split(expand(ans), "\n")
 		for attach in list
 		    call append(line('.'), 'Attach: ' .
-			\ escape(attach, " \t\\"))
+			\ escape(fnamemodify(attach, ':p'), " \t\\"))
 		    redraw
 		endfor
 		if <sid>CheckAlreadyAttached(subjline)
@@ -209,6 +210,7 @@ fu! <SID>ExternalFileBrowser(pat) "{{{2
 endfu
 
 fu! <SID>AttachFile(...) "{{{2
+    " Called from :AttachFile
     call <sid>Init()
     if empty(a:000) && empty(s:external_file_browser)
 	call <sid>WarningMsg("No pattern supplied, can't attach a file!")
@@ -240,7 +242,7 @@ fu! <SID>AttachFile(...) "{{{2
 	endif
 	for val in list
 	    for item in eval(val)
-		call append('.', 'Attach: '. escape(item, " \t\\"))
+		call append('.', 'Attach: '. escape(fnamemodify(item, ':p'), " \t\\"))
 		redraw!
 	    endfor
 	endfor
@@ -277,7 +279,7 @@ let &cpo = s:cpo_save
 unlet s:cpo_save
 " vim: set foldmethod=marker: 
 doc/CheckAttach.txt	[[[1
-245
+248
 *CheckAttach.txt*  Check attachments when using mutt
 
 Author:  Christian Brabandt <cb@256bit.org>
@@ -436,6 +438,9 @@ Additionally you can specify different patterns at once:
 
 ==============================================================================
 2. CheckAttach History                                   *CheckAttach-history*
+   0.17: (unreleased) "{{{1
+   - Always use the full path to the attached file. Matters if the working
+     directory of mutt and vim disagree.
    0.16: Mar 27, 2014 "{{{1
    - allow to specify several patterns after |:AttachFile| (issue #4,
      https://github.com/chrisbra/CheckAttach/issues/4 reported by AguirreIF,
