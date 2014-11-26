@@ -159,6 +159,8 @@ Additionally you can specify different patterns at once:
    0.17: (unreleased) "{{{1
    - Always use the full path to the attached file. Matters if the working
      directory of mutt and vim disagree.
+   - Using :AttachFile with ranger was broken (reported by Ram-Z at
+     https://github.com/chrisbra/CheckAttach/issues/5, thanks!)
    0.16: Mar 27, 2014 "{{{1
    - allow to specify several patterns after |:AttachFile| (issue #4,
      https://github.com/chrisbra/CheckAttach/issues/4 reported by AguirreIF,

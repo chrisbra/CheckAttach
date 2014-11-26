@@ -210,6 +210,8 @@ fu! <SID>AttachFile(...) "{{{2
     if empty(a:000) && empty(s:external_file_browser)
 	call <sid>WarningMsg("No pattern supplied, can't attach a file!")
 	return
+    else
+	let pattern = empty(a:000) ? '' : a:1
     endif
 
     let s:oldpos = winsaveview()
@@ -221,8 +223,8 @@ fu! <SID>AttachFile(...) "{{{2
 
     let list = []
     if !empty(s:external_file_browser)
-	call <sid>ExternalFileBrowser(isdirectory(a:pattern) ? a:pattern :
-	    \ fnamemodify(a:pattern, ':h'))
+	call <sid>ExternalFileBrowser(isdirectory(pattern) ? pattern :
+	    \ fnamemodify(pattern, ':h'))
     else
 	" glob supports returning a list
 	if v:version > 703 || v:version == 703 && has("patch465")

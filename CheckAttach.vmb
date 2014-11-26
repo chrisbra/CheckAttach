@@ -2,7 +2,7 @@
 UseVimball
 finish
 ftplugin/mail/CheckAttach.vim	[[[1
-275
+277
 " Vim plugin for checking attachments with mutt
 " Maintainer:  Christian Brabandt <cb@256bit.org>
 " Last Change: Thu, 27 Mar 2014 23:24:37 +0100
@@ -215,6 +215,8 @@ fu! <SID>AttachFile(...) "{{{2
     if empty(a:000) && empty(s:external_file_browser)
 	call <sid>WarningMsg("No pattern supplied, can't attach a file!")
 	return
+    else
+	let pattern = empty(a:000) ? '' : a:1
     endif
 
     let s:oldpos = winsaveview()
@@ -226,8 +228,8 @@ fu! <SID>AttachFile(...) "{{{2
 
     let list = []
     if !empty(s:external_file_browser)
-	call <sid>ExternalFileBrowser(isdirectory(a:pattern) ? a:pattern :
-	    \ fnamemodify(a:pattern, ':h'))
+	call <sid>ExternalFileBrowser(isdirectory(pattern) ? pattern :
+	    \ fnamemodify(pattern, ':h'))
     else
 	" glob supports returning a list
 	if v:version > 703 || v:version == 703 && has("patch465")
@@ -279,7 +281,7 @@ let &cpo = s:cpo_save
 unlet s:cpo_save
 " vim: set foldmethod=marker: 
 doc/CheckAttach.txt	[[[1
-248
+250
 *CheckAttach.txt*  Check attachments when using mutt
 
 Author:  Christian Brabandt <cb@256bit.org>
@@ -441,6 +443,8 @@ Additionally you can specify different patterns at once:
    0.17: (unreleased) "{{{1
    - Always use the full path to the attached file. Matters if the working
      directory of mutt and vim disagree.
+   - Using :AttachFile with ranger was broken (reported by Ram-Z at
+     https://github.com/chrisbra/CheckAttach/issues/5, thanks!)
    0.16: Mar 27, 2014 "{{{1
    - allow to specify several patterns after |:AttachFile| (issue #4,
      https://github.com/chrisbra/CheckAttach/issues/4 reported by AguirreIF,
