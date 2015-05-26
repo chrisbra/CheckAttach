@@ -132,6 +132,8 @@ You can disable the plugin by issuing the command >
     :DisableCheckAttach
 Enabling the attachment check is then again enabled by issuing >
     :EnableCheckAttach
+<
+Note: those commands are only available inside a mutt buffer.
 
 If you'd like to suggest adding additional keywords (for your language),
 please contact the author (see first line of this help page).
