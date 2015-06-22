@@ -153,7 +153,14 @@ fu! <SID>CheckAttach() "{{{2
     let subjline = search('^Subject:', 'W')
     let subj = getpos('.')
     " Move after the header line (so we don't match the Subject line
-    noa norm! }
+    noa norm! }0
+    if line('.') == line('$')
+      1 
+      " this is a hack, to find the last header line,
+      " just in case there was no empty line between header and body
+      " see issue https://github.com/chrisbra/CheckAttach/issues/8
+      call search('\%(\%([-A-Za-z]\+\):.*\)\+\n\ze[^:]*$', 'W')
+    endif
     let ans = 1
     if search(pat, 'nW') && !<sid>CheckAlreadyAttached(subjline)
 	" Delete old highlighting, don't pollute buffer with matches

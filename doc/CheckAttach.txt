@@ -158,6 +158,12 @@ Additionally you can specify different patterns at once:
 
 ==============================================================================
 2. CheckAttach History                                   *CheckAttach-history*
+   (unreleased):
+   - Fix a bug, when there was no empty new line in the email and the cursor
+     would end up at the last line. This would prevent the plugin to find any
+     of the check patterns and therefore not ask for attaching a file.
+     (https://github.com/chrisbra/CheckAttach/issues/8, reported by
+     tlimbacker, thanks!)
    0.17: Jan 16, 2015 "{{{1
    - Always use the full path to the attached file. Matters if the working
      directory of mutt and vim disagree.
