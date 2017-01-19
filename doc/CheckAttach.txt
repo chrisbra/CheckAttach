@@ -69,6 +69,9 @@ let g:attach_check_keywords =',foobar'
 NOTE: The comma is important. It is used to separate the different keywords
 and needs to be included.
 
+NOTE: The keywords are matched as regexes, escape an comma with a backslash
+if you really need it.
+
 2. Use an external filemanager
 ------------------------------
 

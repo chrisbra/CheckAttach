@@ -140,7 +140,10 @@ fu! <SID>CheckAttach() "{{{2
     let s:header_end = search('^$', 'W')
     let s:lastline = line('$')
     1
-    let val = join(split(escape(s:attach_check,' \.+*'), ','),'\|')
+    " split by non-escaped comma
+    let val = join(split(s:attach_check, '\m\\\@<!,'),'\|')
+    " remove backslashes in front of escaped commas
+    let val = substitute(val, '\m\\,', ',', 'g')
     " don't match in the quoted part of the message
     let pat = '\(^\s*>\+.*\)\@<!\c\%(' . val . '\)'
     let prompt = "Attach file: (leave empty to abort): "
