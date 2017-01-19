@@ -165,16 +165,7 @@ fu! <SID>CheckAttach() "{{{2
 
     " Search starting at the line, that contains the subject
     let subjline = search('^Subject:', 'W')
-    let subj = getpos('.')
     " Move after the header line (so we don't match the Subject line
-    noa norm! }0
-    if line('.') == line('$')
-      1 
-      " this is a hack, to find the last header line,
-      " just in case there was no empty line between header and body
-      " see issue https://github.com/chrisbra/CheckAttach/issues/8
-      call search('\%(\%([-A-Za-z]\+\):.*\)\+\n\ze[^:]*$', 'W')
-    endif
     let ans = 1
     if search(pat, 'nW') && !<sid>CheckAlreadyAttached(subjline)
 	" Delete old highlighting, don't pollute buffer with matches
@@ -187,11 +178,10 @@ fu! <SID>CheckAttach() "{{{2
 	redr!
 	let ans = input(prompt, "", "file")
         while (ans != '') && (ans != 'n')
-	    norm! }-
 	    if empty(s:external_file_browser)
 		let list = split(expand(ans), "\n")
 		for attach in list
-		    call append(line('.'), 'Attach: ' .
+		    call append(s:header_end, 'Attach: ' .
 			\ escape(fnamemodify(attach, ':p'), " \t\\"))
 		    redraw
 		endfor
@@ -205,7 +195,7 @@ fu! <SID>CheckAttach() "{{{2
 			\ fnamemodify(ans, ':h'))
 		let ans = 'n'
 	    endif
-	    call setpos('.', subj)
+	    call setpos('.', s:header_end)
         endwhile
 	call <SID>CheckNewLastLine()
     endif
@@ -237,7 +227,6 @@ fu! <SID>AttachFile(...) "{{{2
 
     let s:oldpos = winsaveview()
     let s:header_end = <sid>HeaderEnd()
-    norm! -
     let s:lastline = line('$')
     let rest = copy(a:000)
 
