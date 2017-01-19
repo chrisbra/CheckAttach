@@ -167,6 +167,14 @@ Additionally you can specify different patterns at once:
      of the check patterns and therefore not ask for attaching a file.
      (https://github.com/chrisbra/CheckAttach/issues/8, reported by
      tlimbacker, thanks!)
+   - Add attach pseudo header after the last real email header
+     (https://github.com/chrisbra/CheckAttach/issues/9, reported by
+     Konfekt, thanks!)
+   - Check for existence of email headers before trying to add Attach
+     pseudo header
+   - use keywords as regex instead of literal string matches
+     (https://github.com/chrisbra/CheckAttach/issues/10, reported by
+     Konfekt, thanks!)
    0.17: Jan 16, 2015 "{{{1
    - Always use the full path to the attached file. Matters if the working
      directory of mutt and vim disagree.
