@@ -124,6 +124,12 @@ fu! <SID>CheckAlreadyAttached(line) "{{{2
     call setpos('.', cpos)
 endfu
 
+fu! <SID>HeaderEnd() "{{{2
+    " returns last line which has a E-Mail header line
+    1
+    call search('^\m$', 'W')
+    return search('^\m[a-zA-Z-]\+:', 'bW')
+endfu
 fu! <SID>CheckAttach() "{{{2
     " This function checks your mail for the words specified in
     " check, and if it find them, you'll be asked to attach
@@ -135,9 +141,14 @@ fu! <SID>CheckAttach() "{{{2
 	return
     endif
     let s:oldpos = winsaveview()
-    1
     " Needed for function <sid>CheckNewLastLine()
-    let s:header_end = search('^$', 'W')
+    let s:header_end = <sid>HeaderEnd()
+    if s:header_end == 0
+	call <sid>WarningMsg('No headers detected, cannot add Attach header')
+	call <sid>WriteBuf(v:cmdbang)
+	return
+    endif
+
     let s:lastline = line('$')
     1
     " split by non-escaped comma
@@ -225,8 +236,7 @@ fu! <SID>AttachFile(...) "{{{2
     endif
 
     let s:oldpos = winsaveview()
-    1
-    let s:header_end = search('^$', 'W')
+    let s:header_end = <sid>HeaderEnd()
     norm! -
     let s:lastline = line('$')
     let rest = copy(a:000)
