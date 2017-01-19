@@ -1,8 +1,8 @@
-" Vimball Archiver by Charles E. Campbell, Jr., Ph.D.
+" Vimball Archiver by Charles E. Campbell
 UseVimball
 finish
 ftplugin/mail/CheckAttach.vim	[[[1
-277
+286
 " Vim plugin for checking attachments with mutt
 " Maintainer:  Christian Brabandt <cb@256bit.org>
 " Last Change: Thu, 15 Jan 2015 21:01:19 +0100
@@ -129,6 +129,12 @@ fu! <SID>CheckAlreadyAttached(line) "{{{2
     call setpos('.', cpos)
 endfu
 
+fu! <SID>HeaderEnd() "{{{2
+    " returns last line which has a E-Mail header line
+    1
+    call search('^\m$', 'W')
+    return search('^\m[a-zA-Z-]\+:', 'bW')
+endfu
 fu! <SID>CheckAttach() "{{{2
     " This function checks your mail for the words specified in
     " check, and if it find them, you'll be asked to attach
@@ -140,12 +146,20 @@ fu! <SID>CheckAttach() "{{{2
 	return
     endif
     let s:oldpos = winsaveview()
-    1
     " Needed for function <sid>CheckNewLastLine()
-    let s:header_end = search('^$', 'W')
+    let s:header_end = <sid>HeaderEnd()
+    if s:header_end == 0
+	call <sid>WarningMsg('No headers detected, cannot add Attach header')
+	call <sid>WriteBuf(v:cmdbang)
+	return
+    endif
+
     let s:lastline = line('$')
     1
-    let val = join(split(escape(s:attach_check,' \.+*'), ','),'\|')
+    " split by non-escaped comma
+    let val = join(split(s:attach_check, '\m\\\@<!,'),'\|')
+    " remove backslashes in front of escaped commas
+    let val = substitute(val, '\m\\,', ',', 'g')
     " don't match in the quoted part of the message
     let pat = '\(^\s*>\+.*\)\@<!\c\%(' . val . '\)'
     let prompt = "Attach file: (leave empty to abort): "
@@ -156,9 +170,7 @@ fu! <SID>CheckAttach() "{{{2
 
     " Search starting at the line, that contains the subject
     let subjline = search('^Subject:', 'W')
-    let subj = getpos('.')
     " Move after the header line (so we don't match the Subject line
-    noa norm! }
     let ans = 1
     if search(pat, 'nW') && !<sid>CheckAlreadyAttached(subjline)
 	" Delete old highlighting, don't pollute buffer with matches
@@ -171,11 +183,10 @@ fu! <SID>CheckAttach() "{{{2
 	redr!
 	let ans = input(prompt, "", "file")
         while (ans != '') && (ans != 'n')
-	    norm! }-
 	    if empty(s:external_file_browser)
 		let list = split(expand(ans), "\n")
 		for attach in list
-		    call append(line('.'), 'Attach: ' .
+		    call append(s:header_end, 'Attach: ' .
 			\ escape(fnamemodify(attach, ':p'), " \t\\"))
 		    redraw
 		endfor
@@ -189,7 +200,7 @@ fu! <SID>CheckAttach() "{{{2
 			\ fnamemodify(ans, ':h'))
 		let ans = 'n'
 	    endif
-	    call setpos('.', subj)
+	    call setpos('.', s:header_end)
         endwhile
 	call <SID>CheckNewLastLine()
     endif
@@ -220,9 +231,7 @@ fu! <SID>AttachFile(...) "{{{2
     endif
 
     let s:oldpos = winsaveview()
-    1
-    let s:header_end = search('^$', 'W')
-    norm! -
+    let s:header_end = <sid>HeaderEnd()
     let s:lastline = line('$')
     let rest = copy(a:000)
 
@@ -281,7 +290,7 @@ let &cpo = s:cpo_save
 unlet s:cpo_save
 " vim: set foldmethod=marker: 
 doc/CheckAttach.txt	[[[1
-250
+269
 *CheckAttach.txt*  Check attachments when using mutt
 
 Author:  Christian Brabandt <cb@256bit.org>
@@ -353,6 +362,9 @@ let g:attach_check_keywords =',foobar'
 NOTE: The comma is important. It is used to separate the different keywords
 and needs to be included.
 
+NOTE: The keywords are matched as regexes, escape an comma with a backslash
+if you really need it.
+
 2. Use an external filemanager
 ------------------------------
 
@@ -416,6 +428,8 @@ You can disable the plugin by issuing the command >
     :DisableCheckAttach
 Enabling the attachment check is then again enabled by issuing >
     :EnableCheckAttach
+<
+Note: those commands are only available inside a mutt buffer.
 
 If you'd like to suggest adding additional keywords (for your language),
 please contact the author (see first line of this help page).
@@ -440,6 +454,20 @@ Additionally you can specify different patterns at once:
 
 ==============================================================================
 2. CheckAttach History                                   *CheckAttach-history*
+   (unreleased):
+   - Fix a bug, when there was no empty new line in the email and the cursor
+     would end up at the last line. This would prevent the plugin to find any
+     of the check patterns and therefore not ask for attaching a file.
+     (https://github.com/chrisbra/CheckAttach/issues/8, reported by
+     tlimbacker, thanks!)
+   - Add attach pseudo header after the last real email header
+     (https://github.com/chrisbra/CheckAttach/issues/9, reported by
+     Konfekt, thanks!)
+   - Check for existence of email headers before trying to add Attach
+     pseudo header
+   - use keywords as regex instead of literal string matches
+     (https://github.com/chrisbra/CheckAttach/issues/10, reported by
+     Konfekt, thanks!)
    0.17: Jan 16, 2015 "{{{1
    - Always use the full path to the attached file. Matters if the working
      directory of mutt and vim disagree.
