@@ -69,6 +69,9 @@ let g:attach_check_keywords =',foobar'
 NOTE: The comma is important. It is used to separate the different keywords
 and needs to be included.
 
+NOTE: The keywords are matched as regexes, escape an comma with a backslash
+if you really need it.
+
 2. Use an external filemanager
 ------------------------------
 
@@ -132,6 +135,8 @@ You can disable the plugin by issuing the command >
     :DisableCheckAttach
 Enabling the attachment check is then again enabled by issuing >
     :EnableCheckAttach
+<
+Note: those commands are only available inside a mutt buffer.
 
 If you'd like to suggest adding additional keywords (for your language),
 please contact the author (see first line of this help page).
@@ -156,6 +161,20 @@ Additionally you can specify different patterns at once:
 
 ==============================================================================
 2. CheckAttach History                                   *CheckAttach-history*
+   (unreleased):
+   - Fix a bug, when there was no empty new line in the email and the cursor
+     would end up at the last line. This would prevent the plugin to find any
+     of the check patterns and therefore not ask for attaching a file.
+     (https://github.com/chrisbra/CheckAttach/issues/8, reported by
+     tlimbacker, thanks!)
+   - Add attach pseudo header after the last real email header
+     (https://github.com/chrisbra/CheckAttach/issues/9, reported by
+     Konfekt, thanks!)
+   - Check for existence of email headers before trying to add Attach
+     pseudo header
+   - use keywords as regex instead of literal string matches
+     (https://github.com/chrisbra/CheckAttach/issues/10, reported by
+     Konfekt, thanks!)
    0.17: Jan 16, 2015 "{{{1
    - Always use the full path to the attached file. Matters if the working
      directory of mutt and vim disagree.

@@ -46,7 +46,7 @@ fu! <SID>Init() "{{{2
     let s:matchid = []
 
     " On which keywords to trigger, comma separated list of keywords
-    let s:attach_check = 'attach,attachment,angehängt,Anhang'
+    let s:attach_check = 'attach,attachment,enclose,CV,cover letter,.doc,.pdf,.tex,Anhang,häng,Wiedervorlage,Begleitschreiben,anbei'
     let s:attach_check .= exists("g:attach_check_keywords") ? 
 	\ g:attach_check_keywords : ''
     
