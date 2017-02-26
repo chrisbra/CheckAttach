@@ -203,15 +203,35 @@ fu! <SID>CheckAttach() "{{{2
     call winrestview(s:oldpos)
 endfu
 
-fu! <SID>ExternalFileBrowser(pat) "{{{2
-    " Call external File Browser
-    exe ':sil !' s:external_file_browser   a:pat
+fu! <SID>AppendAttachedFiles() "{{{2
+    " Append attached files to the header section
     " Force redrawing, so the screen doesn't get messed up
     redr!
     if filereadable(s:external_choosefile)
 	call append('.', map(readfile(s:external_choosefile), '"Attach: ".
 	    \ escape(v:val, " \t\\")'))
 	call delete(s:external_choosefile)
+    endif
+endfu
+
+fu! <SID>ExternalFileBrowser(pat) "{{{2
+    " Call external File Browser
+    if has('nvim')
+	" Neovim requires that the file browser be opened in the neovim
+	" terminal. When the terminal with the filebrowser is opened,
+	" all other tabs are locked. When the terminal is closed,
+	" the tab is closed and back to the previous buffer -- we depend
+	" on that.
+	augroup TerminalClosed
+	    au BufEnter <buffer> :call <SID>AppendAttachedFiles()
+	    " Delete autocmd after it is executed
+	    au BufEnter <buffer> au!
+	augroup END
+	tabnew
+	execute 'terminal ' s:external_file_browser   a:pat
+    else
+	exe ':sil !' s:external_file_browser   a:pat
+	call <SID>AppendAttachedFiles()
     endif
 endfu
 
@@ -255,7 +275,7 @@ fu! <SID>AttachFile(...) "{{{2
     endif
     call <SID>CheckNewLastLine()
     call winrestview(s:oldpos)
-endfun
+endfu
 
 fu! <SID>CheckNewLastLine() "{{{2
     let s:newlastline = line('$')
@@ -283,4 +303,4 @@ call <SID>TriggerAuCmd(s:load_autocmd)
 " Restore setting and modeline "{{{2
 let &cpo = s:cpo_save
 unlet s:cpo_save
-" vim: set foldmethod=marker: 
+" vim: set foldmethod=marker ts=8:

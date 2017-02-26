@@ -175,6 +175,8 @@ Additionally you can specify different patterns at once:
    - use keywords as regex instead of literal string matches
      (https://github.com/chrisbra/CheckAttach/issues/10, reported by
      Konfekt, thanks!)
+   - make use of Neovims :terminal for calling out to ranger
+     (PR #14, contributed by has2k1, thanks!)
    0.17: Jan 16, 2015 "{{{1
    - Always use the full path to the attached file. Matters if the working
      directory of mutt and vim disagree.
