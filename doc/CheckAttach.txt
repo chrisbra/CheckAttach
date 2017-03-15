@@ -107,10 +107,9 @@ that file.
 3. Check only once
 ------------------
 
-You can CheckAttach configure, so that it will only check once until an
-:Attach header is present and on further writes, it will assume that nothing
-needs to be done since you already attached a file. To enable this, simply set
-this variable: >
+You can CheckAttach configure, so that it will only check once and on further
+writes, it will assume that nothing needs to be done.
+To enable this, simply set this variable: >
 
     :let g:checkattach_once = 'y'
 <
@@ -177,6 +176,10 @@ Additionally you can specify different patterns at once:
      Konfekt, thanks!)
    - make use of Neovims :terminal for calling out to ranger
      (PR #14, contributed by has2k1, thanks!)
+   - disable attachment checking when `g:attachcheck_once` is set and 
+     it has already been checked once 
+     (https://github.com/chrisbra/CheckAttach/issues/17, reported by
+     Konfekt, thanks!)
    0.17: Jan 16, 2015 "{{{1
    - Always use the full path to the attached file. Matters if the working
      directory of mutt and vim disagree.

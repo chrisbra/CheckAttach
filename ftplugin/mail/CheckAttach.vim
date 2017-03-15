@@ -110,7 +110,7 @@ fu! <SID>CheckAlreadyAttached(line) "{{{2
   " Cursor should be at the subject line,
   " so Attach-header line should be below current position.
   try
-    if get(g:, 'checkattach_once', 0) &&
+    if get(g:, 'checkattach_once', 'n') ==? 'y' &&
     \ search('^Attach: ', 'nW')
       return 1
     else
@@ -193,6 +193,11 @@ fu! <SID>CheckAttach() "{{{2
       endif
       call setpos('.', s:header_end)
     endwhile
+    if (empty(ans) || ans ==? 'n') && get(g:, 'checkattach_once', 'n') ==? 'y'
+      " do not trigger the autocommand anymore
+      call <sid>TriggerAuCmd(0)
+      call <sid>WarningMsg('Disableing Attachment Checking')
+    endif
     call <SID>CheckNewLastLine()
   endif
   call <SID>WriteBuf(v:cmdbang)
