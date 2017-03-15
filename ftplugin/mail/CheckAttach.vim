@@ -196,7 +196,7 @@ fu! <SID>CheckAttach() "{{{2
     if (empty(ans) || ans ==? 'n') && get(g:, 'checkattach_once', 'n') ==? 'y'
       " do not trigger the autocommand anymore
       call <sid>TriggerAuCmd(0)
-      call <sid>WarningMsg('Disableing Attachment Checking')
+      call <sid>WarningMsg('Disabling Attachment Checking')
     endif
     call <SID>CheckNewLastLine()
   endif
