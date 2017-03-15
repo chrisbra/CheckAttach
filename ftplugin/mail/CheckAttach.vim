@@ -109,14 +109,16 @@ fu! <SID>CheckAlreadyAttached(line) "{{{2
   exe a:line
   " Cursor should be at the subject line,
   " so Attach-header line should be below current position.
-  if exists("g:checkattach_once") &&
-  \ g:checkattach_once =~? 'y' &&
-  \ search('^Attach: ', 'nW')
-    return 1
-  else
-    return 0
-  endif
-  call setpos('.', cpos)
+  try
+    if get(g:, 'checkattach_once', 0) &&
+    \ search('^Attach: ', 'nW')
+      return 1
+    else
+      return 0
+    endif
+  finally
+    call setpos('.', cpos)
+  endtry
 endfu
 fu! <SID>HeaderEnd() "{{{2
   " returns last line which has a E-Mail header line
