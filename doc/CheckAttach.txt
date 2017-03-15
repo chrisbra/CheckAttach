@@ -107,7 +107,7 @@ that file.
 3. Check only once
 ------------------
 
-You can CheckAttach configure, so that it will only check once and on further
+You can configure CheckAttach so that it will only check once; on further
 writes, it will assume that nothing needs to be done.
 To enable this, simply set this variable: >
 
