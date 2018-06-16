@@ -90,6 +90,7 @@ fu! <SID>AutoCmd() "{{{2
   if !empty("s:load_autocmd") && s:load_autocmd 
     augroup CheckAttach  
       au! BufWriteCmd <buffer> :call <SID>CheckAttach() 
+      au! BufWriteCmd <buffer> :call <SID>CheckFilePath()
     augroup END
   else
     silent! au! CheckAttach BufWriteCmd <buffer>
@@ -286,6 +287,22 @@ fu! <SID>CheckNewLastLine() "{{{2
     endif
   endif
 endfu
+fun <SID>CheckFilePath() "{{{2
+  let line_number = 1
+  let last_line_number = line('$')
+  while line_number < last_line_number
+    let line = getline(line_number)
+    if empty(line) | break | endif
+    let file = matchstr(line, '^\vAttach:\s*\zs(.*)$')
+    if filereadable(file)
+      call system('test -r ' . file)
+      if v:shell_error
+        call setline(line_number, 'Attach: ' . fnameescape(file))
+      endif
+    endif
+    let line_number = line_number + 1
+  endwhile
+endf
 " Define Commands: "{{{1
 " Define commands that will disable and enable the plugin.
 command! -buffer EnableCheckAttach  :call <SID>TriggerAuCmd(1)
