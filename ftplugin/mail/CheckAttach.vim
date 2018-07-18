@@ -89,7 +89,11 @@ fu! <SID>AutoCmd() "{{{2
   " Enable Auto command
   if !empty("s:load_autocmd") && s:load_autocmd 
     augroup CheckAttach  
-      au! BufWriteCmd <buffer> :call <SID>CheckAttach() 
+      au!
+      " First Check file path for existing Attach headers,
+      " then Check for more Attachments to come
+      au BufWriteCmd <buffer> :call <SID>CheckFilePath()
+      au BufWriteCmd <buffer> :call <SID>CheckAttach() 
     augroup END
   else
     silent! au! CheckAttach BufWriteCmd <buffer>
@@ -286,6 +290,34 @@ fu! <SID>CheckNewLastLine() "{{{2
     endif
   endif
 endfu
+fun <SID>CheckFilePath() "{{{2
+  if !get(g:, 'checkattach_check_filepath', 1)
+    return
+  endif
+  let oldpos = winsaveview()
+  try
+    1
+    " Search starting at the line, that contains the subject
+    let attachline = search('^Attach: ', 'W')
+    while attachline > 0
+      let file = matchstr(getline(attachline), '^\vAttach:\s*\zs(.*)$')
+      " only escape, if the file has spaces and hasn't been escaped before
+      " Note: For mutt it is technically possible, to add an optional
+      "       description after the filename, so it might contain spaces.
+      "       However, then the match should not be filereadable, so it
+      "       shouldn't mangle a description line (see also mutt manual)
+      if filereadable(file) && match(file, '[\\]\@<! ') > 0
+        let file=fnamemodify(file, ':p')
+        call setline(attachline, 'Attach: ' . escape(file, " \t\\"))
+      endif
+      " move to end of match, search again
+      norm! $
+      let attachline = search('^Attach:', 'W')
+    endwhile
+  finally
+    call winrestview(oldpos)
+  endtry
+endf
 " Define Commands: "{{{1
 " Define commands that will disable and enable the plugin.
 command! -buffer EnableCheckAttach  :call <SID>TriggerAuCmd(1)

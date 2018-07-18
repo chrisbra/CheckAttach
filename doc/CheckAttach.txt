@@ -113,7 +113,17 @@ To enable this, simply set this variable: >
 
     :let g:checkattach_once = 'y'
 <
+4. Check existing headers and escape paths if needed
+----------------------------------------------------
 
+CheckAttach by default also checks for each "Attach: " header line, if
+the file to be attached needs to have spaces escaped. So it will replace
+spaces by "\ " so that mutt is able to find the file and can attach it.
+This behaviour is enabled by default. To disable this, simply set this
+variable: >
+
+    :let g:checkattach_check_filepath = 0
+<
                                                         *CheckAttach_Problems*
 Problems with CheckAttach
 =========================
@@ -176,9 +186,12 @@ Additionally you can specify different patterns at once:
      Konfekt, thanks!)
    - make use of Neovims :terminal for calling out to ranger
      (PR #14, contributed by has2k1, thanks!)
-   - disable attachment checking when `g:attachcheck_once` is set and 
-     it has already been checked once 
+   - disable attachment checking when `g:attachcheck_once` is set and
+     it has already been checked once
      (https://github.com/chrisbra/CheckAttach/issues/17, reported by
+     Konfekt, thanks!)
+   - Allow to check existing attachment headers and escape file paths
+     if needed. (https://github.com/chrisbra/CheckAttach/pull/21, reported by
      Konfekt, thanks!)
    0.17: Jan 16, 2015 "{{{1
    - Always use the full path to the attached file. Matters if the working
@@ -250,7 +263,7 @@ Additionally you can specify different patterns at once:
     - Small changes to the documentation
 
     0.5: Mar  02, 2010 "{{{1
-    
+
     - Search without matching case
 
     0.4: Jan  26, 2010 "{{{1
@@ -263,11 +276,11 @@ Additionally you can specify different patterns at once:
     - Fixed Copyright statement, enabled GetLatestScripts
 
     0.2: Sept 29, 2009 "{{{1
-    
+
     - Added Documentation
 
     0.1: Sept 29, 2009 "{{{1
-    
+
     - First working version, using simple commands
 
 ==============================================================================
