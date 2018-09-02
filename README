@@ -52,6 +52,10 @@ whose filename contain spaces. If you are using mutt version smaller 1.5.20
 this means you would have to rename those files first before attaching them.
 (See mutt bug 3179: http://dev.mutt.org/trac/ticket/3179)
 
+Note: Starting with mutt 1.8, there exists the `abort_noattach` quadoption,
+which allows to abort sending a message that has no attachments and matches
+the `abort_noattach_regexp` option.
+
 Configuration                                        *CheckAttach-Config*
 =============
 
