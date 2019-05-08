@@ -197,6 +197,8 @@ Additionally you can specify different patterns at once:
    - Allow to check existing attachment headers and escape file paths
      if needed. (https://github.com/chrisbra/CheckAttach/pull/21, reported by
      Konfekt, thanks!)
+   - Do not check the signature
+     https://github.com/chrisbra/CheckAttach/issues/25
    0.17: Jan 16, 2015 "{{{1
    - Always use the full path to the attached file. Matters if the working
      directory of mutt and vim disagree.

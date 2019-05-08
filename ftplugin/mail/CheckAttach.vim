@@ -165,9 +165,18 @@ fu! <SID>CheckAttach() "{{{2
 
   " Search starting at the line, that contains the subject
   let subjline = search('^Subject:', 'W')
+  " Search for Signature, do not check signatures by default
+  let sigline  = search('^-- $', 'nW')
+  if sigline == 0
+    " no signature found
+    let sigline = line('$')
+  endif
   " Move after the header line (so we don't match the Subject line
   let ans = 1
-  if search(pat, 'nW') && !<sid>CheckAlreadyAttached(subjline)
+  let attachline=search(pat, 'nW')
+  " Only ask, if keyword found in body of mail (not in signature!)
+  if attachline && sigline >= attachline &&
+        \ !<sid>CheckAlreadyAttached(subjline)
     " Delete old highlighting, don't pollute buffer with matches
     if exists("s:matchid")
       "for i in s:matchid | call matchdelete(i) | endfor
